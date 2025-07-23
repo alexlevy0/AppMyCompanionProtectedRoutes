@@ -136,16 +136,12 @@ export default function IndexScreen() {
             </Form.Text>
           </Rounded>
         </Form.Section>
-
-        {/* <FontSection /> */}
         <Form.Section
           title=""
           footer=""
         >
           <SegmentsTest />
         </Form.Section>
-
-
         {process.env.EXPO_OS === "ios" && (
           <Form.Section title="Date">
             <Form.DatePicker value={new Date()} accentColor={AC.label}>
@@ -168,16 +164,11 @@ export default function IndexScreen() {
             </Form.Text>
           </Form.Section>
         )}
-
-
         <Form.Section>
           <Form.HStack style={{ alignItems: "stretch", gap: 12 }}>
             <TripleItemTest />
           </Form.HStack>
         </Form.Section>
-
-        {/* <Switches /> */}
-
         <Form.Section>
           <Form.HStack style={{ gap: 16 }}>
             <Image
@@ -194,11 +185,25 @@ export default function IndexScreen() {
                 This iPhone 16 Pro Max
               </Form.Text>
             </View>
-
             <View style={{ flex: 1 }} />
-
-            <Image
+            {/* <Image
+              // source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
               source="sf:person.fill.badge.plus"
+              style={{
+                aspectRatio: 1,
+                height: 48,
+                borderRadius: 999,
+              }}
+              animationSpec={{
+                effect: {
+                  type: "pulse",
+                },
+                repeating: true,
+              }}
+            /> */}
+            <Image
+              // source="sf:person.fill.badge.plus"
+              source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
               tintColor={AC.systemBlue}
               size={24}
               animationSpec={{
@@ -210,9 +215,6 @@ export default function IndexScreen() {
             />
           </Form.HStack>
         </Form.Section>
-
-        {/* <HTMLPictureExample /> */}
-
         <Form.Section
           title="Links"
           footer={
@@ -221,30 +223,27 @@ export default function IndexScreen() {
               enter into Safari, Siri, and Spotlight in a way that is not linked
               to you.{"\n\n"}Searches include lookups of general knowledge, and
               requests to do things like play music and get directions.{"\n"}
-              <Link style={{ color: AC.link }} href="/two">
+              <Link style={{ color: AC.link }} href="/modal">
                 About Search & Privacy...
               </Link>
             </Text>
           }
         >
-          {/* <Link href="/two">Next</Link> */}
-
           <Form.Link target="_blank" href="https://evanbacon.dev">
-            Target _blank
+            <Form.Text>Alex's iPhone</Form.Text>
           </Form.Link>
-
-          <Link href="/two">
+          <Form.Link href="/modal">
             <View style={{ gap: 4 }}>
-              <Form.Text>Evan's iPhone</Form.Text>
+              <Form.Text>Alex's iPhone</Form.Text>
+              <Text style={Form.FormFont.caption}>This iPhone 16 Pro Max</Text>
+            </View>
+          </Form.Link>
+          <Link href="/modal">
+            <View style={{ gap: 4 }}>
+              <Form.Text>Alex's iPhone</Form.Text>
               <Text style={Form.FormFont.caption}>This iPhone 16 Pro Max</Text>
             </View>
           </Link>
-
-          {/* <Link href="https://expo.dev">Expo</Link> */}
-
-          {/* <Form.Link href="/two" hint="Normal">
-            Hint + Link
-          </Form.Link> */}
         </Form.Section>
       </Form.List>
     </View>
@@ -320,7 +319,7 @@ function TripleItemTest() {
             tintColor={AC.secondaryLabel}
           />
         }
-        subtitle="Evan Bacon"
+        subtitle="Alex Levy"
       />
 
       <View

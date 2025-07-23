@@ -1,10 +1,3 @@
-/**
- * Copyright (c) Evan Bacon.
- * Copyright (c) Nicolas Gallagher.
- *
- * https://github.com/necolas/react-native-web/blob/922c134f2b7c428cc19daaeb3cac4b6a4c8ec6a3/packages/react-native-web/src/exports/Switch/index.js#L1C1-L236C23
- */
-
 import * as AC from "@bacons/apple-colors";
 import * as React from "react";
 import {
