@@ -2,26 +2,27 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { getItem, setItem, deleteItemAsync } from "expo-secure-store";
 import { Platform } from "react-native";
+import { login } from "./login";
+import { register } from "./register";
+import { UserData, UserState } from "@/types";
 
-type UserState = {
-  isLoggedIn: boolean;
-  shouldCreateAccount: boolean;
-  hasCompletedOnboarding: boolean;
-  isVip: boolean;
-  _hasHydrated: boolean;
-  logIn: () => void;
-  logOut: () => void;
-  completeOnboarding: () => void;
-  resetOnboarding: () => void;
-  logInAsVip: () => void;
-  setHasHydrated: (value: boolean) => void;
-};
+// Constants
+export const AUTH_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxBlSRVwQfIyjDXoMBD3B0R7cmaHkBPv1IBOJS4nI3aX-lbEASF7hYyn8YPInBl1B8s/exec";
 
-// Créer un storage adaptatif selon la plateforme
+// Utility functions
+export function hashPassword(password: string): string {
+  // Simple hash pour le MVP (à améliorer en production)
+  return btoa(password + "salt_mycompanion_2025");
+}
+
+export function generateUserId(): string {
+  return "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+}
+
 const createAdaptiveStorage = () => {
   if (Platform.OS === "web") {
-    // Sur web, utiliser localStorage
-    return createJSONStorage(() => ({
+    return createJSONStorage<UserState>(() => ({
       setItem: async (key: string, value: string) => {
         try {
           localStorage.setItem(key, value);
@@ -47,7 +48,7 @@ const createAdaptiveStorage = () => {
     }));
   } else {
     // Sur native, utiliser expo-secure-store
-    return createJSONStorage(() => ({
+    return createJSONStorage<UserState>(() => ({
       setItem,
       getItem,
       removeItem: deleteItemAsync,
@@ -63,13 +64,33 @@ export const useAuthStore = create(
       hasCompletedOnboarding: false,
       isVip: false,
       _hasHydrated: false,
-      logIn: () => {
-        set((state) => {
-          return {
+      user: null,
+      logIn: async (email: string, password: string) => {
+        const result = await login(email, password);
+        if (result.success && result.user) {
+          set((state) => ({
             ...state,
             isLoggedIn: true,
-          };
-        });
+            user: result.user,
+          }));
+        }
+
+        return result;
+      },
+      register: async (userData: UserData) => {
+        const result = await register(userData);
+        if (result.success) {
+          set((state) => ({
+            ...state,
+            isLoggedIn: true,
+            user: {
+              id: generateUserId(),
+              name: userData.name,
+              email: userData.email,
+            },
+          }));
+        }
+        return result;
       },
       logInAsVip: () => {
         set((state) => {
@@ -86,6 +107,7 @@ export const useAuthStore = create(
             ...state,
             isVip: false,
             isLoggedIn: false,
+            user: null,
           };
         });
       },
@@ -130,23 +152,6 @@ export const useAuthStore = create(
             state.setHasHydrated(true);
           }
         };
-      },
-      // Améliorer la gestion d'erreurs
-      serialize: (state) => {
-        try {
-          return JSON.stringify(state);
-        } catch (error) {
-          console.error("Serialization error:", error);
-          return "{}";
-        }
-      },
-      deserialize: (str) => {
-        try {
-          return JSON.parse(str);
-        } catch (error) {
-          console.error("Deserialization error:", error);
-          return {};
-        }
       },
     },
   ),
