@@ -33,7 +33,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4ce076c6-4931-48f9-8359-368a059eab22"
+        "projectId": "96b796ca-81f5-46e6-bd8b-ff53a27e77b3"
       }
     },
     "owner": "alexlevy0",
@@ -41,7 +41,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/4ce076c6-4931-48f9-8359-368a059eab22"
+      "url": "https://u.expo.dev/96b796ca-81f5-46e6-bd8b-ff53a27e77b3"
     }
   }
 }
