@@ -17,37 +17,6 @@ export default function RootLayout() {
 
   const [isReady, setIsReady] = useState(false);
 
-  console.log("🔍 Debug Info:");
-  console.log("  Platform:", Platform.OS);
-  console.log("  isLoggedIn:", isLoggedIn);
-  console.log("  shouldCreateAccount:", shouldCreateAccount);
-  console.log("  hasCompletedOnboarding:", hasCompletedOnboarding);
-  console.log("  _hasHydrated:", _hasHydrated);
-  console.log("  isReady:", isReady);
-
-  useEffect(() => {
-    const handleHydration = () => {
-      if (Platform.OS === "web") {
-        // Sur le web, on attend un peu puis on force l'hydratation
-        const timer = setTimeout(() => {
-          if (!_hasHydrated) {
-            console.log("🌐 Web: Forcing hydration after timeout");
-            useAuthStore.getState().setHasHydrated(true);
-          }
-        }, 500); // 500ms de délai
-
-        // Si l'hydratation se fait normalement, on nettoie le timer
-        if (_hasHydrated) {
-          clearTimeout(timer);
-        }
-
-        return () => clearTimeout(timer);
-      }
-    };
-
-    handleHydration();
-  }, []);
-
   useEffect(() => {
     if (_hasHydrated && !isReady) {
       console.log("✅ Store hydrated, hiding splash screen");
