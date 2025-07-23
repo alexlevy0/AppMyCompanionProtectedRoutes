@@ -186,9 +186,9 @@ export default function IndexScreen() {
               </Form.Text>
             </View>
             <View style={{ flex: 1 }} />
-            {/* <Image
-              // source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
-              source="sf:person.fill.badge.plus"
+            <Image
+              source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
+              // source="sf:person.fill.badge.plus"
               style={{
                 aspectRatio: 1,
                 height: 48,
@@ -200,7 +200,7 @@ export default function IndexScreen() {
                 },
                 repeating: true,
               }}
-            /> */}
+            />
             <Image
               // source="sf:person.fill.badge.plus"
               source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
