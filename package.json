@@ -7,7 +7,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "web:deploy:dev": "bunx expo export -p web && eas deploy",
+    "web:deploy:prod": "bunx expo export -p web && eas deploy --prod"
   },
   "dependencies": {
     "@bacons/apple-colors": "^0.0.8",
