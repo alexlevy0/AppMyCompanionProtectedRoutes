@@ -24,7 +24,11 @@
       "package": "com.alexlevy0.appmycompanion"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "server"
+    },
+    "experiments": {
+      "reactServerFunctions": true
     },
     "plugins": [
       "expo-router",
