@@ -4,7 +4,7 @@ import { getItem, setItem, deleteItemAsync } from "expo-secure-store";
 import { Platform } from "react-native";
 import { login } from "./login";
 import { register } from "./register";
-import { UserData, UserState } from "@/types";
+import { UserData, UserState, CallSettings, NotificationSettings } from "@/types";
 
 // Constants
 export const AUTH_SCRIPT_URL =
@@ -132,6 +132,28 @@ export const useAuthStore = create(
           return {
             ...state,
             _hasHydrated: value,
+          };
+        });
+      },
+      updateCallSettings: (settings: CallSettings) => {
+        set((state) => {
+          return {
+            ...state,
+            user: state.user ? {
+              ...state.user,
+              callSettings: settings,
+            } : null,
+          };
+        });
+      },
+      updateNotificationSettings: (settings: NotificationSettings) => {
+        set((state) => {
+          return {
+            ...state,
+            user: state.user ? {
+              ...state.user,
+              notificationSettings: settings,
+            } : null,
           };
         });
       },

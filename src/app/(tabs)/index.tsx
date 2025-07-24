@@ -98,7 +98,7 @@ export default function IndexScreen() {
           },
         }}
       />
-      <Form.List ref={ref} navigationTitle="Components">
+      <Form.List ref={ref} navigationTitle="Home">
         <Form.Section>
           <Rounded padding style={{ alignItems: "center", gap: 8, flex: 1 }}>
             <Image
@@ -162,7 +162,7 @@ export default function IndexScreen() {
           </Form.Section>
         )}
         <Form.Section >
-          <Form.HStack style={{ alignItems: "stretch", gap: 12, borderWidth: 1, borderColor: AC.systemRed }}>
+          <Form.HStack style={{ alignItems: "stretch", gap: 12 }}>
             <TripleItemTest />
           </Form.HStack>
         </Form.Section>
@@ -177,7 +177,7 @@ export default function IndexScreen() {
               }}
             />
             <View style={{ gap: 4 }}>
-              <Form.Text style={Form.FormFont.default}>Evan's iPhone</Form.Text>
+              <Form.Text style={Form.FormFont.default}>Alex's iPhone</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
                 This iPhone 16 Pro Max
               </Form.Text>
@@ -301,22 +301,9 @@ export function TripleItemTest() {
       />
 
       <HorizontalItem
-        title="Developer"
-        badge={
-          <Image
-            name="sf:person.text.rectangle"
-            size={28}
-            weight="bold"
-            animationSpec={{
-              effect: {
-                type: "pulse",
-              },
-              repeating: true,
-            }}
-            tintColor={AC.secondaryLabel}
-          />
-        }
-        subtitle="Alex Levy"
+        title="Conçu avec"
+        badge="❤️"
+        subtitle="pour nos seniors"
       />
 
       <View

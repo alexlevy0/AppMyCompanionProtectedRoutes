@@ -2,17 +2,10 @@ import { View } from "react-native";
 import * as Form from "@/components/ui/form";
 import { Pressable } from "react-native";
 import * as AC from "@bacons/apple-colors";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
-
-// Types
-type TimeSlot = "9:00-12:00" | "12:00-15:00" | "15:00-18:00";
-
-interface DaySchedule {
-  name: string;
-  enabled: boolean;
-  timeSlot: TimeSlot;
-}
+import { useAuthStore } from "@/utils/authStore";
+import { TimeSlot, DaySchedule, CallSettings } from "@/types";
 
 // Constants
 const TIME_SLOTS = [
@@ -30,6 +23,19 @@ const DAYS_OF_WEEK = [
   "Saturday",
   "Sunday",
 ] as const;
+
+// Default timezone
+const DEFAULT_TIMEZONE = "Paris, France";
+
+// Default schedules
+const getDefaultSchedules = (): Record<string, DaySchedule> =>
+  DAYS_OF_WEEK.reduce(
+    (acc, day) => ({
+      ...acc,
+      [day]: { name: day, enabled: false, timeSlot: "9:00-12:00" },
+    }),
+    {} as Record<string, DaySchedule>
+  );
 
 // Components
 const RadioButton = ({
@@ -111,17 +117,37 @@ const DayScheduleItem = ({
 );
 
 export default function CallSettingsScreen() {
-
-  // Initialize schedule state
+  const { user, updateCallSettings } = useAuthStore();
+  
+  // Initialize state from store or defaults
+  const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
   const [schedules, setSchedules] = useState<Record<string, DaySchedule>>(
-    DAYS_OF_WEEK.reduce(
-      (acc, day) => ({
-        ...acc,
-        [day]: { name: day, enabled: false, timeSlot: "9:00-12:00" },
-      }),
-      {} as Record<string, DaySchedule>
-    )
+    getDefaultSchedules()
   );
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load settings from store on mount (only once)
+  useEffect(() => {
+    if (user?.callSettings && !isInitialized) {
+      setTimezone(user.callSettings.timezone);
+      setSchedules(user.callSettings.schedules);
+      setIsInitialized(true);
+    } else if (!user?.callSettings && !isInitialized) {
+      // If no settings exist, mark as initialized to avoid infinite loop
+      setIsInitialized(true);
+    }
+  }, [user?.callSettings, isInitialized]);
+
+  // Save settings to store whenever they change (only after initialization)
+  useEffect(() => {
+    if (isInitialized) {
+      const callSettings: CallSettings = {
+        timezone,
+        schedules,
+      };
+      updateCallSettings(callSettings);
+    }
+  }, [timezone, schedules, updateCallSettings, isInitialized]);
 
   // Handlers
   const handleToggleDay = (day: string, enabled: boolean) => {
@@ -147,7 +173,7 @@ export default function CallSettingsScreen() {
       style={{ backgroundColor: AC.systemGroupedBackground }}
     >
       <Form.Section title="Your self timezone">
-        <Form.Link href="/two" hint="Paris, France">
+        <Form.Link href="/timezones-settings" hint={timezone}>
           Timezone
         </Form.Link>
       </Form.Section>
