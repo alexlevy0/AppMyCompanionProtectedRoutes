@@ -42,11 +42,8 @@ export default function IndexScreen() {
     };
   });
 
-  const [show, setShow] = React.useState(false);
-
   return (
-    <View style={{ flex: 1 }}>
-      {/* {show && <GlurryList setShow={setShow} />} */}
+    <View style={{ flex: 1, backgroundColor: AC.systemBackground }}>
       <Stack.Screen
         options={{
           headerLargeTitle: false,
@@ -164,8 +161,8 @@ export default function IndexScreen() {
             </Form.Text>
           </Form.Section>
         )}
-        <Form.Section>
-          <Form.HStack style={{ alignItems: "stretch", gap: 12 }}>
+        <Form.Section >
+          <Form.HStack style={{ alignItems: "stretch", gap: 12, borderWidth: 1, borderColor: AC.systemRed }}>
             <TripleItemTest />
           </Form.HStack>
         </Form.Section>
@@ -288,7 +285,7 @@ function SegmentsTest() {
   );
 }
 
-function TripleItemTest() {
+export function TripleItemTest() {
   return (
     <>
       <HorizontalItem title="Expires" badge="88" subtitle="Days" />
