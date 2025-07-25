@@ -134,15 +134,18 @@ export default function CallSettingsScreen() {
   
   // Initialize state from store or defaults
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
-  const [schedules, setSchedules] = useState<Record<string, DaySchedule>>({});
+  const [schedules, setSchedules] = useState<Record<string, DaySchedule>>(() => {
+    // Initialiser avec des schedules par défaut dès le début
+    return DAYS_OF_WEEK.length > 0 ? getDefaultSchedules() : {};
+  });
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialiser les schedules avec les valeurs par défaut dès que DAYS_OF_WEEK est disponible
   useEffect(() => {
-    if (DAYS_OF_WEEK.length > 0 && Object.keys(schedules).length === 0 && !isInitialized) {
+    if (DAYS_OF_WEEK.length > 0 && Object.keys(schedules).length === 0) {
       setSchedules(getDefaultSchedules());
     }
-  }, [DAYS_OF_WEEK, getDefaultSchedules, isInitialized]);
+  }, [DAYS_OF_WEEK, getDefaultSchedules]);
 
   // Load settings from store on mount (only once)
   useEffect(() => {

@@ -5,6 +5,7 @@ import { Button } from "@/components/Button";
 import { useAuthStore } from "@/utils/authStore";
 import { useState } from "react";
 import { useI18n } from "@/utils/I18nContext";
+import * as AC from "@bacons/apple-colors";
 
 export default function SignInScreen() {
   const { logIn, logInAsVip } = useAuthStore();
@@ -15,7 +16,7 @@ export default function SignInScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert(i18n.t('error'), i18n.t('pleaseFillAllFields'));
+      Alert.alert(t('error'), t('pleaseFillAllFields'));
       return;
     }
 
@@ -24,29 +25,40 @@ export default function SignInScreen() {
       const result = await logIn(email, password);
 
       if (result.success) {
-        Alert.alert(i18n.t('success'), i18n.t('connectionSuccessful'));
+        Alert.alert(t('success'), t('connectionSuccessful'));
       } else {
-        Alert.alert(i18n.t('error'), result.error || i18n.t('connectionFailed'));
+        Alert.alert(t('error'), result.error || t('connectionFailed'));
       }
     } catch (error) {
-      Alert.alert(i18n.t('error'), i18n.t('anErrorOccurred'));
+      Alert.alert(t('error'), t('anErrorOccurred'));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <View className="justify-center flex-1 p-4">
+    <View 
+      className="justify-center flex-1 p-4"
+      style={{ backgroundColor: AC.systemGroupedBackground }}
+    >
       <AppText center size="heading" className="mb-8">
-        {i18n.t('connection')}
+        {t('connection')}
       </AppText>
 
       <View className="space-y-4 mb-6">
         <View>
-          <AppText className="mb-2">{i18n.t('email')}</AppText>
+          <AppText className="mb-2">{t('email')}</AppText>
           <TextInput
-            className="border border-gray-300 rounded-lg p-3 bg-white"
-            placeholder={`Entrez votre ${i18n.t('email').toLowerCase()}`}
+            style={{
+              borderWidth: 1,
+              borderColor: AC.separator,
+              borderRadius: 8,
+              padding: 12,
+              backgroundColor: AC.secondarySystemGroupedBackground,
+              color: AC.label,
+            }}
+            placeholder={`Entrez votre ${t('email').toLowerCase()}`}
+            placeholderTextColor={AC.tertiaryLabel}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -56,10 +68,18 @@ export default function SignInScreen() {
         </View>
 
         <View>
-          <AppText className="mb-2">{i18n.t('password')}</AppText>
+          <AppText className="mb-2">{t('password')}</AppText>
           <TextInput
-            className="border border-gray-300 rounded-lg p-3 bg-white"
-            placeholder={`Entrez votre ${i18n.t('password').toLowerCase()}`}
+            style={{
+              borderWidth: 1,
+              borderColor: AC.separator,
+              borderRadius: 8,
+              padding: 12,
+              backgroundColor: AC.secondarySystemGroupedBackground,
+              color: AC.label,
+            }}
+            placeholder={`Entrez votre ${t('password').toLowerCase()}`}
+            placeholderTextColor={AC.tertiaryLabel}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -70,14 +90,14 @@ export default function SignInScreen() {
       </View>
 
       <Button
-        title={isLoading ? i18n.t('sending') : i18n.t('signIn')}
+        title={isLoading ? t('sending') : t('signIn')}
         onPress={handleLogin}
         disabled={isLoading}
       />
 
       <View className="mt-4 space-y-2">
         <Link asChild href="/register-modal">
-          <Button title={i18n.t('signUp')} theme="secondary" />
+          <Button title={t('signUp')} theme="secondary" />
         </Link>
         {/* <Button
           title="Sign in as VIP 👑"

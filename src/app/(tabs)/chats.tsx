@@ -48,12 +48,11 @@ const MessageBubble = ({ message, formatTime }: { message: Message; formatTime: 
         <AppText
           className="text-sm leading-5"
           color={message.isUser ? "white" : "primary"}
-          selectable
         >
           {message.text}
         </AppText>
         {message.isUser && message.status === 'sending' && (
-          <ActivityIndicator size="small" color={AC.white} style={{ marginTop: 4 }} />
+          <ActivityIndicator size="small" color={AC.label} style={{ marginTop: 4 }} />
         )}
         {message.isUser && message.status === 'error' && (
           <View className="flex-row items-center mt-1">
@@ -77,36 +76,43 @@ const MessageBubble = ({ message, formatTime }: { message: Message; formatTime: 
 export default function ChatsScreen() {
   const { logOut, resetOnboarding } = useAuthStore();
   const { t } = useI18n();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: t('defaultMessages.greeting'),
-      isUser: false,
-      timestamp: new Date(Date.now() - 60000),
-      status: 'sent',
-    },
-    {
-      id: "2",
-      text: t('defaultMessages.response'),
-      isUser: true,
-      timestamp: new Date(Date.now() - 45000),
-      status: 'sent',
-    },
-    {
-      id: "3",
-      text: t('defaultMessages.followUp'),
-      isUser: false,
-      timestamp: new Date(Date.now() - 30000),
-      status: 'sent',
-    },
-    {
-      id: "4",
-      text: t('defaultMessages.project'),
-      isUser: true,
-      timestamp: new Date(Date.now() - 15000),
-      status: 'sent',
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // Initialiser les messages avec les traductions
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([
+        {
+          id: "1",
+          text: t('defaultMessages.greeting'),
+          isUser: false,
+          timestamp: new Date(Date.now() - 60000),
+          status: 'sent',
+        },
+        {
+          id: "2",
+          text: t('defaultMessages.response'),
+          isUser: true,
+          timestamp: new Date(Date.now() - 45000),
+          status: 'sent',
+        },
+        {
+          id: "3",
+          text: t('defaultMessages.followUp'),
+          isUser: false,
+          timestamp: new Date(Date.now() - 30000),
+          status: 'sent',
+        },
+        {
+          id: "4",
+          text: t('defaultMessages.project'),
+          isUser: true,
+          timestamp: new Date(Date.now() - 15000),
+          status: 'sent',
+        },
+      ]);
+    }
+  }, [t, messages.length]);
   
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -268,8 +274,11 @@ export default function ChatsScreen() {
     >
       {/* Header */}
       <View 
-        className="border-b border-gray-200 px-4 py-3 flex-row items-center justify-between" 
-        style={{ backgroundColor: AC.systemBackground }}
+        className="border-b px-4 py-3 flex-row items-center justify-between" 
+        style={{ 
+          backgroundColor: AC.systemBackground,
+          borderColor: AC.separator
+        }}
       >
         <AppText className="text-lg font-semibold flex-1 text-center" color="primary">
           Chat
@@ -308,8 +317,8 @@ export default function ChatsScreen() {
               <View className="flex-row items-center">
                 <View className="flex-row space-x-1">
                   <View className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" />
-                  <View className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: '0.2s' }} />
-                  <View className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: '0.4s' }} />
+                  <View className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" />
+                  <View className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" />
                 </View>
                 <AppText className="text-xs ml-2" color="secondary">
                   En train d'écrire...
@@ -323,7 +332,10 @@ export default function ChatsScreen() {
       {/* Input */}
       <View 
         className="border-t px-4 py-3" 
-        style={{ backgroundColor: AC.systemBackground, borderColor: AC.separator }}
+        style={{ 
+          backgroundColor: AC.systemBackground, 
+          borderColor: AC.separator 
+        }}
       >
         <View className="flex-row items-end space-x-2">
           <View className="flex-1">
@@ -362,12 +374,12 @@ export default function ChatsScreen() {
             accessibilityState={{ disabled: !canSend }}
           >
             {isSending ? (
-              <ActivityIndicator size="small" color={AC.white} />
+              <ActivityIndicator size="small" color={AC.label} />
             ) : (
               <Ionicons
                 name="send"
                 size={20}
-                color={canSend ? AC.white : AC.tertiaryLabel}
+                color={canSend ? AC.label : AC.tertiaryLabel}
               />
             )}
           </TouchableOpacity>
