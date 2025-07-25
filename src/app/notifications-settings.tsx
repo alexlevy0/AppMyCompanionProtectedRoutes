@@ -53,55 +53,54 @@ export default function ModalScreenScreen() {
 
   return (
     <View
-      className="flex-1 p-4"
+      className="flex-1"
       style={{ backgroundColor: AC.systemGroupedBackground }}
     >
-      <Form.Section title="Notifications">
-        <Form.HStack>
-          <View style={{ gap: 4 }}>
-            <Form.Text>If we notice a low mood</Form.Text>
-            <Form.Text style={Form.FormFont.caption}>
-              If we detect that your self seems down, we'll notify you so that
-              you can offer prompt support.
-            </Form.Text>
-          </View>
-          <View style={{ flex: 1 }} />
-          <Switch
-            onValueChange={(value) => handleToggleSetting("lowMood", value)}
-            value={notificationSettings.lowMood}
-          />
-        </Form.HStack>
-        <Form.HStack>
-          <View style={{ gap: 4 }}>
-            <Form.Text>If several calls are missed</Form.Text>
-            <Form.Text style={Form.FormFont.caption}>
-              If our call is missed, we'll try again every hour. If none of the
-              calls are answered, we'll notify you to keep you informed of
-              potential issues.
-            </Form.Text>
-          </View>
-          <View style={{ flex: 1 }} />
-          <Switch
-            onValueChange={(value) => handleToggleSetting("missedCalls", value)}
-            value={notificationSettings.missedCalls}
-          />
-        </Form.HStack>
-        <Form.HStack>
-          <View style={{ gap: 4 }}>
-            <Form.Text>If we detect a new topic to discuss</Form.Text>
-            <Form.Text style={Form.FormFont.caption}>
-              If we detect a new topic of interest during the calls, we'll share
-              it with you, providing conversation starts for your next
-              conversation with your self.
-            </Form.Text>
-          </View>
-          <View style={{ flex: 1 }} />
-          <Switch
-            onValueChange={(value) => handleToggleSetting("newTopics", value)}
-            value={notificationSettings.newTopics}
-          />
-        </Form.HStack>
-      </Form.Section>
+      <Form.List navigationTitle="Home">
+        <Form.Section title="Notifications">
+          <Form.HStack>
+            <View style={{ gap: 4 }}>
+              <Form.Text>If we notice a low mood</Form.Text>
+              <Form.Text style={Form.FormFont.caption}>
+                If we detect that your self seems down.
+              </Form.Text>
+            </View>
+            <View style={{ flex: 1 }} />
+            <Switch
+              onValueChange={(value) => handleToggleSetting("lowMood", value)}
+              value={notificationSettings.lowMood}
+            />
+          </Form.HStack>
+          <Form.HStack>
+            <View style={{ gap: 4 }}>
+              <Form.Text>If several calls are missed</Form.Text>
+              <Form.Text style={Form.FormFont.caption}>
+                If our call is missed, we'll try again every hour.
+              </Form.Text>
+            </View>
+            <View style={{ flex: 1 }} />
+            <Switch
+              onValueChange={(value) =>
+                handleToggleSetting("missedCalls", value)
+              }
+              value={notificationSettings.missedCalls}
+            />
+          </Form.HStack>
+          <Form.HStack>
+            <View style={{ gap: 4 }}>
+              <Form.Text>If we detect a new topic to discuss</Form.Text>
+              <Form.Text style={Form.FormFont.caption}>
+                If we detect a new topic of interest.
+              </Form.Text>
+            </View>
+            <View style={{ flex: 1 }} />
+            <Switch
+              onValueChange={(value) => handleToggleSetting("newTopics", value)}
+              value={notificationSettings.newTopics}
+            />
+          </Form.HStack>
+        </Form.Section>
+      </Form.List>
     </View>
   );
 }

@@ -172,6 +172,7 @@ export default function CallSettingsScreen() {
       className="flex-1 p-4"
       style={{ backgroundColor: AC.systemGroupedBackground }}
     >
+      <Form.List navigationTitle="Home">
       <Form.Section title="Your self timezone">
         <Form.Link href="/timezones-settings" hint={timezone}>
           Timezone
@@ -186,8 +187,9 @@ export default function CallSettingsScreen() {
             onToggle={(enabled) => handleToggleDay(day, enabled)}
             onTimeSelect={(time) => handleTimeSelect(day, time)}
           />
-        ))}
-      </Form.Section>
+          ))}
+        </Form.Section>
+      </Form.List>
     </View>
   );
 }
