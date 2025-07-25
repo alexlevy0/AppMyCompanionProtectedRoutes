@@ -27,12 +27,35 @@ import {
   Switch,
   Text,
   TextInput,
-  View
+  View,
+  TouchableOpacity,
+  Alert
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useI18n } from "@/utils/I18nContext";
+import { useAuthStore } from "@/utils/authStore";
 
 export default function IndexScreen() {
   const { t } = useI18n();
+  const { user, removeSelectedContact } = useAuthStore();
+
+  const handleRemoveContact = () => {
+    Alert.alert(
+      t('removeContact'),
+      `${t('confirmRemoveContact')} ${user?.selectedContact?.name} ?`,
+      [
+        {
+          text: t('cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('remove'),
+          style: 'destructive',
+          onPress: removeSelectedContact,
+        },
+      ]
+    );
+  };
   const ref = useAnimatedRef();
   const scroll = useScrollViewOffset(ref);
   const style = useAnimatedStyle(() => {
@@ -135,6 +158,100 @@ export default function IndexScreen() {
             </Form.Text>
           </Rounded>
         </Form.Section>
+
+        {/* Section Contact sélectionné */}
+        <Form.Section title={t('selectedContact')}>
+          {user?.selectedContact ? (
+            <Rounded padding style={{ alignItems: "center", gap: 8 }}>
+              <View style={{ position: "relative", width: "100%" }}>
+                {/* Bouton de suppression */}
+                <TouchableOpacity
+                  onPress={handleRemoveContact}
+                  style={{
+                    position: "absolute",
+                    top: -8,
+                    right: -8,
+                    zIndex: 1,
+                    backgroundColor: AC.systemRed,
+                    borderRadius: 12,
+                    width: 24,
+                    height: 24,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                  }}
+                  accessibilityLabel={t('removeContact')}
+                  accessibilityHint="Double-tap pour supprimer le contact sélectionné"
+                >
+                  <Ionicons name="close" size={16} color="#FFFFFF" />
+                </TouchableOpacity>
+                
+                <View style={{ alignItems: "center", gap: 8 }}>
+                  <Image
+                    source="sf:person.circle.fill"
+                    style={{
+                      aspectRatio: 1,
+                      height: 48,
+                      borderRadius: 24,
+                      tintColor: AC.systemBlue,
+                    }}
+                  />
+                  <View style={{ alignItems: "center" }}>
+                    <Form.Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        color: AC.label,
+                      }}
+                    >
+                      {user.selectedContact.name}
+                    </Form.Text>
+                    {user.selectedContact.selectedPhoneNumber && (
+                      <Form.Text
+                        style={{
+                          fontSize: 16,
+                          color: AC.systemBlue,
+                          fontWeight: "500",
+                        }}
+                      >
+                        {user.selectedContact.selectedPhoneNumber.number}
+                      </Form.Text>
+                    )}
+                  </View>
+                </View>
+              </View>
+            </Rounded>
+          ) : (
+            <Form.Link href="/modal">
+              <View style={{ alignItems: "center", padding: 16 }}>
+                <Image
+                  source="sf:person.badge.plus"
+                  style={{
+                    aspectRatio: 1,
+                    height: 32,
+                    tintColor: AC.systemBlue,
+                  }}
+                />
+                                  <Form.Text
+                    style={{
+                      fontSize: 16,
+                      color: AC.systemBlue,
+                      marginTop: 8,
+                    }}
+                  >
+                    {t('selectContact')}
+                  </Form.Text>
+              </View>
+            </Form.Link>
+          )}
+        </Form.Section>
         <Form.Section
           title=""
           footer=""
@@ -228,8 +345,8 @@ export default function IndexScreen() {
             </Text>
           }
         >
-          <Form.Link target="_blank" href="https://evanbacon.dev">
-            <Form.Text>Alex's iPhone</Form.Text>
+          <Form.Link target="_blank" href="https://getmycompanion.com">
+            <Form.Text>Website</Form.Text>
           </Form.Link>
           <Form.Link href="/modal">
             <View style={{ gap: 4 }}>

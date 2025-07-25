@@ -31,7 +31,13 @@
       "expo-router",
       "expo-secure-store",
       "expo-localization",
-      "@bacons/apple-colors"
+      "@bacons/apple-colors",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+        }
+      ]
     ],
     "extra": {
       "router": {},

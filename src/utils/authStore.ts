@@ -9,6 +9,7 @@ import {
   UserState,
   CallSettings,
   NotificationSettings,
+  SelectedContact,
 } from "@/types";
 
 // Constants
@@ -158,6 +159,30 @@ export const useAuthStore = create(
             ? {
                 ...state.user,
                 notificationSettings: settings,
+              }
+            : null,
+        }));
+      },
+
+      updateSelectedContact: (contact: SelectedContact) => {
+        set((state) => ({
+          ...state,
+          user: state.user
+            ? {
+                ...state.user,
+                selectedContact: contact,
+              }
+            : null,
+        }));
+      },
+
+      removeSelectedContact: () => {
+        set((state) => ({
+          ...state,
+          user: state.user
+            ? {
+                ...state.user,
+                selectedContact: undefined,
               }
             : null,
         }));
