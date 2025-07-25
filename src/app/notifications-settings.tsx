@@ -60,7 +60,7 @@ export default function ModalScreenScreen() {
       <Form.List navigationTitle="Home">
         <Form.Section title={i18n.t('notifications')}>
           <Form.HStack>
-            <View style={{ gap: 4 }}>
+            <View style={{ gap: 4, maxWidth: "80%"}}>
               <Form.Text>{i18n.t('ifWeNoticeLowMood')}</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
                 {i18n.t('ifWeDetectLowMood')}
@@ -73,7 +73,7 @@ export default function ModalScreenScreen() {
             />
           </Form.HStack>
           <Form.HStack>
-            <View style={{ gap: 4 }}>
+            <View style={{ gap: 4, maxWidth: "80%" }}>
               <Form.Text>{i18n.t('ifSeveralCallsMissed')}</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
                 {i18n.t('ifOurCallMissed')}
@@ -88,7 +88,7 @@ export default function ModalScreenScreen() {
             />
           </Form.HStack>
           <Form.HStack>
-            <View style={{ gap: 4 }}>
+            <View style={{ gap: 4, maxWidth: "80%" }}>
               <Form.Text>{i18n.t('ifWeDetectNewTopic')}</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
                 {i18n.t('ifWeDetectNewTopicInterest')}

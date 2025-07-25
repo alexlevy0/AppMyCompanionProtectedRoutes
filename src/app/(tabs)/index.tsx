@@ -252,7 +252,7 @@ export default function IndexScreen() {
             </Form.Link>
           )}
         </Form.Section>
-        <Form.Section
+        {/* <Form.Section
           title=""
           footer=""
         >
@@ -279,8 +279,8 @@ export default function IndexScreen() {
               Manual
             </Form.Text>
           </Form.Section>
-        )}
-        <Form.Section >
+        )} */}
+        {/* <Form.Section >
           <Form.HStack style={{ alignItems: "stretch", gap: 12 }}>
             <TripleItemTest />
           </Form.HStack>
@@ -360,7 +360,7 @@ export default function IndexScreen() {
               <Text style={Form.FormFont.caption}>This iPhone 16 Pro Max</Text>
             </View>
           </Link>
-        </Form.Section>
+        </Form.Section> */}
       </Form.List>
     </View>
   );
