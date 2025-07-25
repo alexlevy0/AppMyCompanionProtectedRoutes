@@ -33,7 +33,6 @@ const translations = {
     signInAsVip: 'Se connecter en tant que VIP 👑',
     
     // Messages d'erreur
-    error: 'Erreur',
     success: 'Succès',
     pleaseFillAllFields: 'Veuillez remplir tous les champs',
     connectionFailed: 'Échec de la connexion',
@@ -107,7 +106,28 @@ const translations = {
         'Merci pour ce partage. Que penses-tu de la suite ?',
         'C\'est passionnant ! J\'ai hâte d\'en savoir plus.'
       ]
-    }
+    },
+    
+    // Contacts
+    selectedContact: 'Contact sélectionné',
+    selectContact: 'Sélectionner un contact',
+    selectContactDescription: 'Choisissez un contact pour l\'afficher sur la page d\'accueil',
+    contactSelected: 'Contact sélectionné',
+    chooseNumber: 'Choisir un numéro',
+    selectNumberFor: 'Sélectionnez un numéro pour',
+    permissionDenied: 'Permission refusée',
+    contactsPermissionRequired: 'L\'accès aux contacts est nécessaire pour sélectionner un contact.',
+    error: 'Erreur',
+    cannotLoadContacts: 'Impossible de charger les contacts.',
+    noContactsFound: 'Aucun contact trouvé ou permission refusée',
+    loadingContacts: 'Chargement des contacts...',
+    phoneNumbers: 'numéro de téléphone',
+    phoneNumbersPlural: 'numéros de téléphone',
+    removeContact: 'Supprimer le contact',
+    contactRemoved: 'Contact supprimé',
+    confirmRemoveContact: 'Êtes-vous sûr de vouloir supprimer',
+    cancel: 'Annuler',
+    remove: 'Supprimer'
   },
   en: {
     // Navigation
@@ -139,7 +159,6 @@ const translations = {
     signInAsVip: 'Sign in as VIP 👑',
     
     // Error messages
-    error: 'Error',
     success: 'Success',
     pleaseFillAllFields: 'Please fill all fields',
     connectionFailed: 'Connection failed',
@@ -213,7 +232,27 @@ const translations = {
         'Thank you for sharing. What do you think about what\'s next?',
         'That\'s exciting! I can\'t wait to learn more.'
       ]
-    }
+    },
+    
+    // Contacts
+    selectedContact: 'Selected Contact',
+    selectContact: 'Select Contact',
+    selectContactDescription: 'Choose a contact to display on the home page',
+    contactSelected: 'Contact Selected',
+    chooseNumber: 'Choose Number',
+    selectNumberFor: 'Select a number for',
+    permissionDenied: 'Permission Denied',
+    contactsPermissionRequired: 'Access to contacts is required to select a contact.',
+    cannotLoadContacts: 'Unable to load contacts.',
+    noContactsFound: 'No contacts found or permission denied',
+    loadingContacts: 'Loading contacts...',
+    phoneNumbers: 'phone number',
+    phoneNumbersPlural: 'phone numbers',
+    removeContact: 'Remove contact',
+    contactRemoved: 'Contact removed',
+    confirmRemoveContact: 'Are you sure you want to remove',
+    cancel: 'Cancel',
+    remove: 'Remove'
   }
 };
 

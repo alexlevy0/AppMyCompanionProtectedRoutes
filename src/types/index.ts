@@ -18,6 +18,21 @@ export type NotificationSettings = {
   newTopics: boolean;
 };
 
+export type SelectedContact = {
+  id: string;
+  name: string;
+  phoneNumbers?: Array<{
+    id: string;
+    number: string;
+    label: string;
+  }>;
+  selectedPhoneNumber?: {
+    id: string;
+    number: string;
+    label: string;
+  };
+};
+
 export type User = {
   id: string;
   name: string;
@@ -25,6 +40,7 @@ export type User = {
   phone?: string;
   callSettings?: CallSettings;
   notificationSettings?: NotificationSettings;
+  selectedContact?: SelectedContact;
 };
 
 export type LoginResult = {
@@ -61,4 +77,6 @@ export type UserState = {
   setHasHydrated: (value: boolean) => void;
   updateCallSettings: (settings: CallSettings) => void;
   updateNotificationSettings: (settings: NotificationSettings) => void;
+  updateSelectedContact: (contact: SelectedContact) => void;
+  removeSelectedContact: () => void;
 };
