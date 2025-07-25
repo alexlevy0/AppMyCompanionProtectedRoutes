@@ -9,9 +9,14 @@ import * as AC from "@bacons/apple-colors";
 import { Rounded } from "@/components/ui/rounded";
 import { Image } from "@/components/ui/img";
 import { TripleItemTest } from "./index";
+import { useI18n } from "@/utils/I18nContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { TranslationTest } from "@/components/TranslationTest";
+import { DaysOfWeekTest } from "@/components/DaysOfWeekTest";
 
 export default function SettingsScreen() {
   const { logOut, resetOnboarding } = useAuthStore();
+  const { t } = useI18n();
 
   return (
     <View
@@ -39,48 +44,60 @@ export default function SettingsScreen() {
                 fontWeight: "600",
               }}
             >
-              MyCompanion
+              {t('appName')}
             </Form.Text>
             <Form.Text style={{ textAlign: "center", fontSize: 14 }}>
-              MyCompanion calls your Senior daily and keeps you informed.
+              {t('appDescription')}
             </Form.Text>
           </Rounded>
         </Form.Section>
-        <Form.Section title="Settings">
+        <Form.Section title={t('settings')}>
           <Form.Link href="/call-settings">
             <View style={{ gap: 4 }}>
-              <Form.Text>Call Settings</Form.Text>
+              <Form.Text>{t('callSettings')}</Form.Text>
             </View>
           </Form.Link>
           <Link href="/notifications-settings">
             <View style={{ gap: 4 }}>
-              <Form.Text>Notifications</Form.Text>
+              <Form.Text>{t('notifications')}</Form.Text>
             </View>
           </Link>
         </Form.Section>
+        
+        <Form.Section title={t('language')}>
+          <LanguageSelector />
+        </Form.Section>
+{/*         
+        <Form.Section title="Test des traductions">
+          <TranslationTest />
+        </Form.Section>
+        
+        <Form.Section title="Test des jours de la semaine">
+          <DaysOfWeekTest />
+        </Form.Section> */}
         <Form.Section title="App">
           <Form.Link href="/modal?deleteAccount=true">
             <View style={{ gap: 4 }}>
-              <Form.Text>Delete Account</Form.Text>
+              <Form.Text>{t('deleteAccount')}</Form.Text>
             </View>
           </Form.Link>
           <Link target="_blank" href="https://getmycompanion.com">
             <View style={{ gap: 4 }}>
-              <Form.Text>Contact Support</Form.Text>
+              <Form.Text>{t('contactSupport')}</Form.Text>
             </View>
           </Link>
           <Link href="/settings" asChild style={{ flex: 1 }}>
             <Pressable style={{ flex: 1, gap: 4 }} onPress={resetOnboarding}>
-              <Form.Text>Reset Onboarding</Form.Text>
+              <Form.Text>{t('resetOnboarding')}</Form.Text>
             </Pressable>
           </Link>
           <Link href="/settings" asChild>
             <Pressable style={{ flex: 1, gap: 4 }} onPress={logOut}>
-              <Form.Text>Sign out</Form.Text>
+              <Form.Text>{t('signOut')}</Form.Text>
             </Pressable>
           </Link>
         </Form.Section>
-        <Form.Section title="Status">
+        <Form.Section title={t('status')}>
           <Form.HStack style={{ alignItems: "stretch", gap: 12 }}>
             <TripleItemTest />
           </Form.HStack>

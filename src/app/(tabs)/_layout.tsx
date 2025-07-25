@@ -5,23 +5,24 @@ import { Image } from "expo-image";
 import * as AC from "@bacons/apple-colors";
 import { Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useI18n } from "@/utils/I18nContext";
 
 export default function TabsLayout() {
   const { isVip } = useAuthStore();
+  const { t } = useI18n();
   return (
     <Tabs>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Accueil",
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
-              size={size}
-              color={color}
-            />
-          ),
-          title: "Accueil",
+              <Tabs.Screen
+          name="index"
+          options={{
+            title: t('home'),
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={size}
+                color={color}
+              />
+            ),
           headerTitle() {
             if (process.env.EXPO_OS === "web") {
               return (
@@ -49,7 +50,7 @@ export default function TabsLayout() {
                       fontWeight: "bold",
                     }}
                   >
-                    MyCompanion
+                    {t('appName')}
                   </Text>
                 </Animated.View>
               );
@@ -75,7 +76,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="vip"
           options={{
-            title: "VIP",
+            title: t('vip'),
             tabBarIcon: ({ focused, color, size }) => (
               <Ionicons
                 name={focused ? "diamond" : "diamond-outline"}
@@ -86,32 +87,32 @@ export default function TabsLayout() {
           }}
         />
       </Tabs.Protected>
-      <Tabs.Screen
-        name="chats"
-        options={{
-          title: "Chats",
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? "chatbubble" : "chatbubble-outline"}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "Paramètres",
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? "settings" : "settings-outline"}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
+              <Tabs.Screen
+          name="chats"
+          options={{
+            title: t('chats'),
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name={focused ? "chatbubble" : "chatbubble-outline"}
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
+              <Tabs.Screen
+          name="settings"
+          options={{
+            title: t('settings'),
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name={focused ? "settings" : "settings-outline"}
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
     </Tabs>
   );
 }

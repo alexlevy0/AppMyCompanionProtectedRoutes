@@ -29,8 +29,10 @@ import {
   TextInput,
   View
 } from "react-native";
+import { useI18n } from "@/utils/I18nContext";
 
 export default function IndexScreen() {
+  const { t } = useI18n();
   const ref = useAnimatedRef();
   const scroll = useScrollViewOffset(ref);
   const style = useAnimatedStyle(() => {
@@ -75,7 +77,7 @@ export default function IndexScreen() {
                       fontWeight: "bold",
                     }}
                   >
-                    MyCompanion
+                    {t('appName')}
                   </Text>
                 </Animated.View>
               );
@@ -117,10 +119,10 @@ export default function IndexScreen() {
                 fontWeight: "600",
               }}
             >
-              MyCompanion
+              {t('appName')}
             </Form.Text>
             <Form.Text style={{ textAlign: "center", fontSize: 14 }}>
-              MyCompanion calls your Senior daily and keeps you informed.{" "}
+              {t('appDescription')}{" "}
               <Form.Link
                 style={{
                   color: AC.link,
@@ -128,7 +130,7 @@ export default function IndexScreen() {
                 }}
                 href="/info"
               >
-                Learn more...
+                {t('learnMore')}
               </Form.Link>
             </Form.Text>
           </Rounded>
@@ -213,7 +215,7 @@ export default function IndexScreen() {
           </Form.HStack>
         </Form.Section>
         <Form.Section
-          title="Links"
+          title={t('links')}
           footer={
             <Text>
               Help improve Search by allowing Apple to store the searches you
@@ -221,7 +223,7 @@ export default function IndexScreen() {
               to you.{"\n\n"}Searches include lookups of general knowledge, and
               requests to do things like play music and get directions.{"\n"}
               <Link style={{ color: AC.link }} href="/modal">
-                About Search & Privacy...
+                {t('aboutSearchPrivacy')}
               </Link>
             </Text>
           }
@@ -257,27 +259,27 @@ export default function IndexScreen() {
   // );
 }
 function SegmentsTest() {
-
+  const { t } = useI18n();
 
   return (
     <View style={{ flex: 1 }}>
       <Segments defaultValue="account">
         <SegmentsList>
-          <SegmentsTrigger value="connexion">Connexion</SegmentsTrigger>
-          <SegmentsTrigger value="inscription">Inscription</SegmentsTrigger>
+          <SegmentsTrigger value="connexion">{t('connection')}</SegmentsTrigger>
+          <SegmentsTrigger value="inscription">{t('registration')}</SegmentsTrigger>
         </SegmentsList>
 
         <SegmentsContent value="connexion">
           <Form.Section title="">
-            <TextInput placeholder="Email" />
-            <Form.TextField placeholder="Mot de passe" />
+            <TextInput placeholder={t('email')} />
+            <Form.TextField placeholder={t('password')} />
           </Form.Section>
         </SegmentsContent>
         <SegmentsContent value="inscription">
           <Form.Section title="">
-            <TextInput placeholder="Email" />
-            <Form.TextField placeholder="Mot de passe" />
-            <Form.TextField placeholder="Mot de passe" />
+            <TextInput placeholder={t('email')} />
+            <Form.TextField placeholder={t('password')} />
+            <Form.TextField placeholder={t('confirmPassword')} />
           </Form.Section>
         </SegmentsContent>
       </Segments>
@@ -286,9 +288,11 @@ function SegmentsTest() {
 }
 
 export function TripleItemTest() {
+  const { t } = useI18n();
+  
   return (
     <>
-      <HorizontalItem title="Expires" badge="88" subtitle="Days" />
+      <HorizontalItem title={t('expires')} badge="88" subtitle={t('days')} />
 
       <View
         style={{
@@ -301,9 +305,9 @@ export function TripleItemTest() {
       />
 
       <HorizontalItem
-        title="Conçu avec"
+        title={t('designedWith')}
         badge="❤️"
-        subtitle="pour nos seniors"
+        subtitle={t('forOurSeniors')}
       />
 
       <View
@@ -316,7 +320,7 @@ export function TripleItemTest() {
         }}
       />
 
-      <HorizontalItem title="Version" badge="3.6" subtitle="Build 250" />
+      <HorizontalItem title={t('version')} badge="3.6" subtitle={`${t('build')} 250`} />
     </>
   );
 }

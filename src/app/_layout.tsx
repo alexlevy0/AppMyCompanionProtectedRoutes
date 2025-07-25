@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { useAuthStore } from "@/utils/authStore";
 import { Platform, View, Text, ActivityIndicator } from "react-native";
+import { I18nProvider } from "@/utils/I18nContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -62,37 +63,39 @@ export default function RootLayout() {
   }
 
   return (
-    <React.Fragment>
-      <StatusBar style="auto" />
-      <Stack>
-        <Stack.Protected guard={isLoggedIn}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-          <Stack.Screen
-            name="call-settings"
-            options={{
-              title: "Call Settings",
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="notifications-settings"
-            options={{
-              title: "Notifications",
-              presentation: "modal",
-            }}
-          />
-        </Stack.Protected>
-        <Stack.Protected guard={!isLoggedIn && hasCompletedOnboarding}>
-          <Stack.Screen name="sign-in" />
-          <Stack.Protected guard={shouldCreateAccount}>
-            <Stack.Screen name="create-account" />
+    <I18nProvider>
+      <React.Fragment>
+        <StatusBar style="auto" />
+        <Stack>
+          <Stack.Protected guard={isLoggedIn}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+            <Stack.Screen
+              name="call-settings"
+              options={{
+                title: "Call Settings",
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen
+              name="notifications-settings"
+              options={{
+                title: "Notifications",
+                presentation: "modal",
+              }}
+            />
           </Stack.Protected>
-        </Stack.Protected>
-        <Stack.Protected guard={!hasCompletedOnboarding}>
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        </Stack.Protected>
-      </Stack>
-    </React.Fragment>
+          <Stack.Protected guard={!isLoggedIn && hasCompletedOnboarding}>
+            <Stack.Screen name="sign-in" />
+            <Stack.Protected guard={shouldCreateAccount}>
+              <Stack.Screen name="create-account" />
+            </Stack.Protected>
+          </Stack.Protected>
+          <Stack.Protected guard={!hasCompletedOnboarding}>
+            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          </Stack.Protected>
+        </Stack>
+      </React.Fragment>
+    </I18nProvider>
   );
 }

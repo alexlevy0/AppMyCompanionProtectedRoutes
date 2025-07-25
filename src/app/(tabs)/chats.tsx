@@ -15,6 +15,7 @@ import { useAuthStore } from "@/utils/authStore";
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import * as AC from "@bacons/apple-colors";
+import { useI18n } from "@/utils/I18nContext";
 
 interface Message {
   id: string;
@@ -75,31 +76,32 @@ const MessageBubble = ({ message, formatTime }: { message: Message; formatTime: 
 
 export default function ChatsScreen() {
   const { logOut, resetOnboarding } = useAuthStore();
+  const { t } = useI18n();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Salut ! Comment ça va ?",
+      text: t('defaultMessages.greeting'),
       isUser: false,
       timestamp: new Date(Date.now() - 60000),
       status: 'sent',
     },
     {
       id: "2",
-      text: "Très bien merci ! Et toi ?",
+      text: t('defaultMessages.response'),
       isUser: true,
       timestamp: new Date(Date.now() - 45000),
       status: 'sent',
     },
     {
       id: "3",
-      text: "Parfait ! Tu veux qu'on discute de quelque chose en particulier aujourd'hui ? J'ai hâte d'entendre tes idées !",
+      text: t('defaultMessages.followUp'),
       isUser: false,
       timestamp: new Date(Date.now() - 30000),
       status: 'sent',
     },
     {
       id: "4",
-      text: "Oui, j'aimerais parler de notre projet !",
+      text: t('defaultMessages.project'),
       isUser: true,
       timestamp: new Date(Date.now() - 15000),
       status: 'sent',
@@ -169,13 +171,7 @@ export default function ChatsScreen() {
 
       // Simuler une réponse automatique
       setTimeout(() => {
-        const replies = [
-          "C'est très intéressant ! Peux-tu m'en dire plus ?",
-          "Je comprends. Comment puis-je t'aider ?",
-          "Excellente idée ! Continuons sur ce sujet.",
-          "Merci pour ce partage. Que penses-tu de la suite ?",
-          "C'est passionnant ! J'ai hâte d'en savoir plus."
-        ];
+        const replies = t('defaultMessages.autoReplies');
         
         const randomReply = replies[Math.floor(Math.random() * replies.length)];
         
@@ -200,11 +196,11 @@ export default function ChatsScreen() {
       );
       
       Alert.alert(
-        "Erreur d'envoi",
-        "Impossible d'envoyer le message. Vérifiez votre connexion.",
+        t('error'),
+        t('sendingError'),
         [
-          { text: "Réessayer", onPress: () => retryMessage(tempId, messageText) },
-          { text: "Annuler", style: "cancel" }
+          { text: t('retry'), onPress: () => retryMessage(tempId, messageText) },
+          { text: t('cancel'), style: "cancel" }
         ]
       );
     } finally {

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import * as AC from "@bacons/apple-colors";
 import { useAuthStore } from "@/utils/authStore";
 import { NotificationSettings } from "@/types";
+import i18n from "@/utils/i18n";
 
 // Default notification settings
 const getDefaultNotificationSettings = (): NotificationSettings => ({
@@ -57,12 +58,12 @@ export default function ModalScreenScreen() {
       style={{ backgroundColor: AC.systemGroupedBackground }}
     >
       <Form.List navigationTitle="Home">
-        <Form.Section title="Notifications">
+        <Form.Section title={i18n.t('notifications')}>
           <Form.HStack>
             <View style={{ gap: 4 }}>
-              <Form.Text>If we notice a low mood</Form.Text>
+              <Form.Text>{i18n.t('ifWeNoticeLowMood')}</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
-                If we detect that your self seems down.
+                {i18n.t('ifWeDetectLowMood')}
               </Form.Text>
             </View>
             <View style={{ flex: 1 }} />
@@ -73,9 +74,9 @@ export default function ModalScreenScreen() {
           </Form.HStack>
           <Form.HStack>
             <View style={{ gap: 4 }}>
-              <Form.Text>If several calls are missed</Form.Text>
+              <Form.Text>{i18n.t('ifSeveralCallsMissed')}</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
-                If our call is missed, we'll try again every hour.
+                {i18n.t('ifOurCallMissed')}
               </Form.Text>
             </View>
             <View style={{ flex: 1 }} />
@@ -88,9 +89,9 @@ export default function ModalScreenScreen() {
           </Form.HStack>
           <Form.HStack>
             <View style={{ gap: 4 }}>
-              <Form.Text>If we detect a new topic to discuss</Form.Text>
+              <Form.Text>{i18n.t('ifWeDetectNewTopic')}</Form.Text>
               <Form.Text style={Form.FormFont.caption}>
-                If we detect a new topic of interest.
+                {i18n.t('ifWeDetectNewTopicInterest')}
               </Form.Text>
             </View>
             <View style={{ flex: 1 }} />
