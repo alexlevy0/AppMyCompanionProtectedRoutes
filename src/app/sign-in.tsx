@@ -8,7 +8,6 @@ import { useI18n } from "@/utils/I18nContext";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as AC from "@bacons/apple-colors";
-import { router } from "expo-router";
 import { observer } from '@legendapp/state/react';
 
 export default observer(function SignInScreen() {
