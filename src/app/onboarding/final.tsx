@@ -1,6 +1,6 @@
 import { View, Dimensions, Pressable } from "react-native";
 import { AppText } from "@/components/AppText";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import Animated, {
   useAnimatedStyle,
   withSpring,
@@ -17,16 +17,30 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
+import { router } from "expo-router";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export default function OnboardingFinalScreen() {
-  const { completeOnboarding } = useAuthStore();
+  const { completeOnboarding, hasCompletedOnboarding } = useAuthStoreObserver();
   const scale = useSharedValue(0);
   const rotation = useSharedValue(0);
   const opacity = useSharedValue(0);
+
+  // Rediriger vers la connexion une fois l'onboarding complété
+  useEffect(() => {
+    if (hasCompletedOnboarding) {
+      console.log('✅ Onboarding completed, redirecting to sign-in...');
+      router.replace('/sign-in');
+    }
+  }, [hasCompletedOnboarding]);
+
+  const handleCompleteOnboarding = () => {
+    console.log('🎯 Completing onboarding...');
+    completeOnboarding();
+  };
 
   useEffect(() => {
     // Démarrer les animations
@@ -140,7 +154,7 @@ export default function OnboardingFinalScreen() {
           className="mb-8"
         >
           <Pressable
-            onPress={completeOnboarding}
+            onPress={handleCompleteOnboarding}
             className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-full overflow-hidden"
           >
             <LinearGradient

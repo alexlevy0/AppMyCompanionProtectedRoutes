@@ -8,11 +8,96 @@ import { Text, Pressable } from "react-native";
 import * as AC from "@bacons/apple-colors";
 import { Rounded } from "@/components/ui/rounded";
 import { Image } from "@/components/ui/img";
-import { TripleItemTest } from "./index";
 import { useI18n } from "@/utils/I18nContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { TranslationTest } from "@/components/TranslationTest";
-import { DaysOfWeekTest } from "@/components/DaysOfWeekTest";
+
+function HorizontalItem({
+  title,
+  badge,
+  subtitle,
+}: {
+  title: string;
+  badge: React.ReactNode;
+  subtitle: string;
+}) {
+  return (
+    <View style={{ alignItems: "center", gap: 4, flex: 1 }}>
+      <Form.Text
+        style={{
+          textTransform: "uppercase",
+          fontSize: 10,
+          fontWeight: "600",
+          color: AC.secondaryLabel,
+        }}
+      >
+        {title}
+      </Form.Text>
+      {typeof badge === "string" ? (
+        <Form.Text
+          style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            color: AC.secondaryLabel,
+          }}
+        >
+          {badge}
+        </Form.Text>
+      ) : (
+        badge
+      )}
+
+      <Form.Text
+        style={{
+          fontSize: 12,
+          color: AC.secondaryLabel,
+        }}
+      >
+        {subtitle}
+      </Form.Text>
+    </View>
+  );
+}
+
+
+export function TripleItemTest() {
+  const { t } = useI18n();
+  
+  return (
+    <>
+      <HorizontalItem title={t('expires')} badge="88" subtitle={t('days')} />
+
+      <View
+        style={{
+          backgroundColor: AC.separator,
+          width: 0.5,
+          maxHeight: "50%",
+          minHeight: "50%",
+          marginVertical: "auto",
+        }}
+      />
+
+      <HorizontalItem
+        title={t('designedWith')}
+        badge="❤️"
+        subtitle={t('forOurSeniors')}
+      />
+
+      <View
+        style={{
+          backgroundColor: AC.separator,
+          width: 0.5,
+          maxHeight: "50%",
+          minHeight: "50%",
+          marginVertical: "auto",
+        }}
+      />
+
+      <HorizontalItem title={t('version')} badge="3.6" subtitle={`${t('build')} 250`} />
+    </>
+  );
+}
+
+
 
 export default function SettingsScreen() {
   const { logOut, resetOnboarding } = useAuthStoreObserver();

@@ -23,13 +23,13 @@ export default observer(function SignInScreen() {
     const newErrors: Record<string, string> = {};
 
     if (!email.trim()) {
-      newErrors.email = t('emailRequired') || "L'email est requis";
+      newErrors.email = t('emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = t('invalidEmailFormat') || "Format d'email invalide";
+      newErrors.email = t('invalidEmailFormat');
     }
 
     if (!password) {
-      newErrors.password = t('passwordRequired') || "Le mot de passe est requis";
+      newErrors.password = t('passwordRequired');
     }
 
     setErrors(newErrors);
@@ -95,7 +95,7 @@ export default observer(function SignInScreen() {
                 {t('connection')}
               </AppText>
               <AppText className="text-gray-600 text-center">
-                {t('welcomeBack') || "Bienvenue ! Connectez-vous pour continuer"}
+                {t('welcomeBack')}
               </AppText>
             </View>
 
@@ -160,7 +160,7 @@ export default observer(function SignInScreen() {
               {/* Forgot Password Link */}
               <Pressable className="mb-6">
                 <AppText className="text-blue-600 text-right font-medium">
-                  {t('forgotPassword') || "Mot de passe oublié ?"}
+                  {t('forgotPassword')}
                 </AppText>
               </Pressable>
               {/* Submit Button */}
@@ -189,7 +189,7 @@ export default observer(function SignInScreen() {
                   className="py-2"
                 >
                   <AppText center className="text-gray-600">
-                    {t('noAccount') || "Pas encore de compte ?"}{" "}
+                    {t('noAccount')}{" "}
                     <AppText className="text-blue-600 font-semibold">
                       {t('signUp')}
                     </AppText>

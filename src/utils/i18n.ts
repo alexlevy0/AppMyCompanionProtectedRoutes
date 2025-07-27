@@ -31,6 +31,9 @@ const translations = {
     signUp: 'S\'inscrire',
     signOut: 'Se déconnecter',
     signInAsVip: 'Se connecter en tant que VIP 👑',
+    welcomeBack: 'Bienvenue ! Connectez-vous pour continuer',
+    forgotPassword: 'Mot de passe oublié ?',
+    noAccount: 'Pas encore de compte ?',
     
     // Messages d'erreur
     success: 'Succès',
@@ -38,6 +41,9 @@ const translations = {
     connectionFailed: 'Échec de la connexion',
     anErrorOccurred: 'Une erreur est survenue',
     connectionSuccessful: 'Connexion réussie !',
+    emailRequired: 'L\'email est requis',
+    invalidEmailFormat: 'Format d\'email invalide',
+    passwordRequired: 'Le mot de passe est requis',
     
     // Chat
     chat: 'Chat',
@@ -157,6 +163,9 @@ const translations = {
     signUp: 'Sign up',
     signOut: 'Sign out',
     signInAsVip: 'Sign in as VIP 👑',
+    welcomeBack: 'Welcome! Sign in to continue',
+    forgotPassword: 'Forgot password?',
+    noAccount: 'No account yet?',
     
     // Error messages
     success: 'Success',
@@ -164,6 +173,9 @@ const translations = {
     connectionFailed: 'Connection failed',
     anErrorOccurred: 'An error occurred',
     connectionSuccessful: 'Connection successful!',
+    emailRequired: 'Email is required',
+    invalidEmailFormat: 'Invalid email format',
+    passwordRequired: 'Password is required',
     
     // Chat
     chat: 'Chat',

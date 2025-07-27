@@ -26,14 +26,9 @@ export function initializeSync() {
   if (!isSSR) {
     console.log('Initializing Legend-State sync...')
     
-    // Charger les données depuis Supabase au démarrage
-    import('./SupaLegend').then(({ loadUsersFromSupabase }) => {
-      loadUsersFromSupabase().then(() => {
-        console.log('Users loaded from Supabase on startup')
-      }).catch((error) => {
-        console.error('Error loading users from Supabase:', error)
-      })
-    })
+    // Note: On ne charge plus tous les utilisateurs au démarrage
+    // Chaque utilisateur sera chargé individuellement quand nécessaire
+    // via getUserById() quand l'utilisateur se connecte
     
     console.log('Legend-State sync initialized successfully')
   }

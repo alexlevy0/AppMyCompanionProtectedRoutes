@@ -22,7 +22,7 @@ export const users$ = observable<Record<string, any>>({})
 // Note: La persistance sera configurée plus tard avec la bonne API
 
 // Fonctions utilitaires pour manipuler les utilisateurs
-export function createUser(userData: Omit<User, 'id'>) {
+export async function createUser(userData: Omit<User, 'id'>) {
   const id = generateId()
   const userRecord = {
     id,
@@ -38,18 +38,21 @@ export function createUser(userData: Omit<User, 'id'>) {
   users$[id].set(userRecord)
   
   // Synchroniser avec Supabase
-  supabase.from('users').insert(userRecord).then(({ error }) => {
+  try {
+    const { error } = await supabase.from('users').insert(userRecord)
     if (error) {
       console.error('Error creating user in Supabase:', error)
     } else {
       console.log('User created in Supabase:', id)
     }
-  })
+  } catch (error) {
+    console.error('Exception while creating user in Supabase:', error)
+  }
   
   return id
 }
 
-export function updateUser(id: string, updates: Partial<User>) {
+export async function updateUser(id: string, updates: Partial<User>) {
   const user = users$[id].get()
   if (user) {
     const updatedUser = {
@@ -64,45 +67,54 @@ export function updateUser(id: string, updates: Partial<User>) {
     users$[id].set(updatedUser)
     
     // Synchroniser avec Supabase
-    supabase.from('users').update(updatedUser).eq('id', id).then(({ error }) => {
+    try {
+      const { error } = await supabase.from('users').update(updatedUser).eq('id', id)
       if (error) {
         console.error('Error updating user in Supabase:', error)
       } else {
         console.log('User updated in Supabase:', id)
       }
-    })
+    } catch (error) {
+      console.error('Exception while updating user in Supabase:', error)
+    }
   }
 }
 
-export function updateUserCallSettings(id: string, settings: CallSettings) {
+export async function updateUserCallSettings(id: string, settings: CallSettings) {
   const user = users$[id].get()
   if (user) {
     const updatedUser = { ...user, call_settings: settings }
     users$[id].set(updatedUser)
     
-    supabase.from('users').update({ call_settings: settings }).eq('id', id).then(({ error }) => {
+    try {
+      const { error } = await supabase.from('users').update({ call_settings: settings }).eq('id', id)
       if (error) {
         console.error('Error updating call settings in Supabase:', error)
       }
-    })
+    } catch (error) {
+      console.error('Exception while updating call settings in Supabase:', error)
+    }
   }
 }
 
-export function updateUserNotificationSettings(id: string, settings: NotificationSettings) {
+export async function updateUserNotificationSettings(id: string, settings: NotificationSettings) {
   const user = users$[id].get()
   if (user) {
     const updatedUser = { ...user, notification_settings: settings }
     users$[id].set(updatedUser)
     
-    supabase.from('users').update({ notification_settings: settings }).eq('id', id).then(({ error }) => {
+    try {
+      const { error } = await supabase.from('users').update({ notification_settings: settings }).eq('id', id)
       if (error) {
         console.error('Error updating notification settings in Supabase:', error)
       }
-    })
+    } catch (error) {
+      console.error('Exception while updating notification settings in Supabase:', error)
+    }
   }
 }
 
-export function updateUserSelectedContact(id: string, contact: SelectedContact | undefined) {
+export async function updateUserSelectedContact(id: string, contact: SelectedContact | undefined) {
   console.log('🔍 updateUserSelectedContact called with:', { id, contact })
   
   const user = users$[id].get()
@@ -113,19 +125,28 @@ export function updateUserSelectedContact(id: string, contact: SelectedContact |
     users$[id].set(updatedUser)
     console.log('🔍 Updated user in observable:', updatedUser)
     
-    return supabase.from('users').update({ selected_contact: contact }).eq('id', id).then(({ error, data }) => {
+    // Utiliser null au lieu de undefined pour Supabase
+    const supabaseContact = contact === undefined ? null : contact
+    
+    try {
+      const { error, data } = await supabase.from('users').update({ selected_contact: supabaseContact }).eq('id', id)
       if (error) {
         console.error('❌ Error updating selected contact in Supabase:', error)
         return { success: false, error }
       } else {
-        console.log('✅ Selected contact updated in Supabase:', { id, contact, data })
+        console.log('✅ Selected contact updated in Supabase:', { id, contact: supabaseContact, data })
         return { success: true, data }
       }
-    })
+    } catch (error) {
+      console.error('❌ Exception while updating selected contact in Supabase:', error)
+      return { success: false, error }
+    }
   } else {
     console.warn('⚠️ User not found in observable for ID:', id)
     // Essayer de récupérer l'utilisateur depuis Supabase
-    return supabase.from('users').select('*').eq('id', id).single().then(({ data, error }) => {
+    try {
+      const { data, error } = await supabase.from('users').select('*').eq('id', id).single()
+      
       if (error) {
         console.error('❌ User not found in Supabase:', error)
         return { success: false, error }
@@ -134,28 +155,35 @@ export function updateUserSelectedContact(id: string, contact: SelectedContact |
         // Créer l'utilisateur dans l'observable local
         users$[id].set({ ...data, selected_contact: contact })
         // Mettre à jour dans Supabase
-        return supabase.from('users').update({ selected_contact: contact }).eq('id', id).then(({ error }) => {
-          if (error) {
-            console.error('❌ Error updating selected contact in Supabase:', error)
-            return { success: false, error }
-          } else {
-            console.log('✅ Selected contact updated in Supabase after user fetch')
-            return { success: true }
-          }
-        })
+        const supabaseContact = contact === undefined ? null : contact
+        
+        const { error: updateError } = await supabase.from('users').update({ selected_contact: supabaseContact }).eq('id', id)
+        if (updateError) {
+          console.error('❌ Error updating selected contact in Supabase:', updateError)
+          return { success: false, error: updateError }
+        } else {
+          console.log('✅ Selected contact updated in Supabase after user fetch')
+          return { success: true }
+        }
       }
-    })
+    } catch (error) {
+      console.error('❌ Exception while fetching/updating user from Supabase:', error)
+      return { success: false, error }
+    }
   }
 }
 
-export function deleteUser(id: string) {
+export async function deleteUser(id: string) {
   users$[id].delete()
   
-  supabase.from('users').delete().eq('id', id).then(({ error }) => {
+  try {
+    const { error } = await supabase.from('users').delete().eq('id', id)
     if (error) {
       console.error('Error deleting user in Supabase:', error)
     }
-  })
+  } catch (error) {
+    console.error('Exception while deleting user in Supabase:', error)
+  }
 }
 
 // Fonction pour obtenir un utilisateur par email
@@ -207,20 +235,24 @@ export function getUserByIdSync(id: string) {
 
 // Fonction pour charger les utilisateurs depuis Supabase
 export async function loadUsersFromSupabase() {
-  const { data, error } = await supabase.from('users').select('*')
-  
-  if (error) {
-    console.error('Error loading users from Supabase:', error)
-    return
-  }
-  
-  if (data) {
-    const usersMap: Record<string, any> = {}
-    data.forEach(user => {
-      usersMap[user.id] = user
-    })
-    users$.set(usersMap)
-    console.log('Users loaded from Supabase:', data.length)
+  try {
+    const { data, error } = await supabase.from('users').select('*')
+    
+    if (error) {
+      console.error('Error loading users from Supabase:', error)
+      return
+    }
+    
+    if (data) {
+      const usersMap: Record<string, any> = {}
+      data.forEach(user => {
+        usersMap[user.id] = user
+      })
+      users$.set(usersMap)
+      console.log('Users loaded from Supabase:', data.length)
+    }
+  } catch (error) {
+    console.error('Exception while loading users from Supabase:', error)
   }
 }
 

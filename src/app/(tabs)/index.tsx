@@ -1,43 +1,25 @@
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { AppText } from "@/components/AppText";
-import { Link } from "expo-router";
 import { Button } from "@/components/Button";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import * as Form from "@/components/ui/form";
-import React, { useEffect } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
-
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from "react-native-reanimated";
-import Stack from "@/components/layout/stack";
-import { Image } from "@/components/ui/img";
+import { Link } from "expo-router";
 import { Rounded } from "@/components/ui/rounded";
-import * as AC from "@bacons/apple-colors";
-import {
-  Segments,
-  SegmentsContent,
-  SegmentsList,
-  SegmentsTrigger,
-} from "@/components/ui/segments";
-import {
-  Appearance,
-  OpaqueColorValue,
-  Switch,
-  Text,
-  TextInput,
-  View,
-  TouchableOpacity,
-  Alert
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Image } from "@/components/ui/img";
 import { useI18n } from "@/utils/I18nContext";
-import { useAuthStoreObserver, authState$ } from "@/utils/authStoreLegend";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { TranslationTest } from "@/components/TranslationTest";
+import { DaysOfWeekTest } from "@/components/DaysOfWeekTest";
+import { Stack } from "expo-router";
+import { useAnimatedRef, useScrollViewOffset } from "react-native-reanimated";
+import { useAnimatedStyle, interpolate } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import * as AC from "@bacons/apple-colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function IndexScreen() {
   const { t } = useI18n();
-  const { user, removeSelectedContact, updateSelectedContact, logInAsVip } = useAuthStoreObserver();
+  const { user, removeSelectedContact } = useAuthStoreObserver();
 
   const handleRemoveContact = () => {
     Alert.alert(
@@ -57,72 +39,6 @@ export default function IndexScreen() {
     );
   };
 
-  const handleTestContactUpdate = () => {
-    console.log('🧪 Testing contact update...')
-    const testContact = {
-      id: 'test-contact-123',
-      name: 'Test Contact',
-      phoneNumbers: [
-        {
-          id: 'phone-1',
-          number: '+1234567890',
-          label: 'mobile'
-        }
-      ],
-      selectedPhoneNumber: {
-        id: 'phone-1',
-        number: '+1234567890',
-        label: 'mobile'
-      }
-    }
-    
-    console.log('🧪 Updating with test contact:', testContact)
-    updateSelectedContact(testContact)
-    
-    Alert.alert(
-      'Test Contact',
-      'Contact de test ajouté. Vérifiez les logs et la base de données.',
-      [{ text: 'OK' }]
-    )
-  };
-
-  const handleResetAndTest = () => {
-    console.log('🔄 Resetting and testing with UUID...')
-    // Forcer la déconnexion et reconnexion pour avoir un UUID valide
-    Alert.alert(
-      'Reset UUID',
-      'Voulez-vous vous déconnecter et vous reconnecter pour avoir un UUID valide ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { 
-          text: 'OK', 
-          onPress: () => {
-            // Déconnexion
-            removeSelectedContact()
-            // Reconnecter en VIP pour avoir un UUID valide
-            setTimeout(() => {
-              logInAsVip()
-              console.log('🔄 Reconnected with new UUID')
-            }, 100)
-          }
-        }
-      ]
-    )
-  };
-
-  const handleForceRefresh = () => {
-    console.log('🔄 Force refreshing user from observable...')
-    // Forcer le rechargement en changeant l'ID utilisateur temporairement
-    const currentUserId = authState$.currentUserId.get()
-    if (currentUserId) {
-      // Simuler un changement d'ID pour forcer le rechargement
-      authState$.currentUserId.set(null)
-      setTimeout(() => {
-        authState$.currentUserId.set(currentUserId)
-        console.log('🔄 User ID reset, should trigger refresh')
-      }, 100)
-    }
-  };
   const ref = useAnimatedRef();
   const scroll = useScrollViewOffset(ref);
   const style = useAnimatedStyle(() => {
@@ -228,45 +144,6 @@ export default function IndexScreen() {
 
         {/* Section Contact sélectionné */}
         <Form.Section title={t('selectedContact')}>
-          {/* Boutons de test */}
-          <View style={{ gap: 8, marginBottom: 8 }}>
-            <TouchableOpacity 
-              onPress={handleTestContactUpdate}
-              style={{ padding: 8, backgroundColor: AC.systemGray5, borderRadius: 8 }}
-            >
-              <AppText size="small" center>
-                🧪 Test: Ajouter un contact de test
-              </AppText>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={handleResetAndTest}
-              style={{ padding: 8, backgroundColor: AC.systemOrange, borderRadius: 8 }}
-            >
-              <AppText size="small" center>
-                🔄 Reset UUID et reconnecter
-              </AppText>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={handleForceRefresh}
-              style={{ padding: 8, backgroundColor: AC.systemBlue, borderRadius: 8 }}
-            >
-              <AppText size="small" center>
-                🔄 Forcer le rechargement de l'utilisateur
-              </AppText>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={handleRemoveContact}
-              style={{ padding: 8, backgroundColor: AC.systemRed, borderRadius: 8 }}
-            >
-              <AppText size="small" center>
-                🗑️ Supprimer le contact sélectionné
-              </AppText>
-            </TouchableOpacity>
-          </View>
-          
           {user?.selectedContact ? (
             <Rounded padding style={{ alignItems: "center", gap: 8 }}>
               <View style={{ position: "relative", width: "100%" }}>
@@ -357,240 +234,10 @@ export default function IndexScreen() {
               </View>
             </Form.Link>
           )}
-        </Form.Section>
-        {/* <Form.Section
-          title=""
-          footer=""
-        >
-          <SegmentsTest />
-        </Form.Section>
-        {process.env.EXPO_OS === "ios" && (
-          <Form.Section title="Date">
-            <Form.DatePicker value={new Date()} accentColor={AC.label}>
-              Birthday
-            </Form.DatePicker>
-            <Form.DatePicker value={new Date()} mode="time">
-              Birthday Minute
-            </Form.DatePicker>
-
-            <Form.Text
-              hint={
-                <DateTimePicker
-                  mode="datetime"
-                  accentColor={AC.systemTeal}
-                  value={new Date()}
-                />
-              }
-            >
-              Manual
-            </Form.Text>
-          </Form.Section>
-        )} */}
-        {/* <Form.Section >
-          <Form.HStack style={{ alignItems: "stretch", gap: 12 }}>
-            <TripleItemTest />
-          </Form.HStack>
-        </Form.Section>
-        <Form.Section>
-          <Form.HStack style={{ gap: 16 }}>
-            <Image
-              source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
-              style={{
-                aspectRatio: 1,
-                height: 48,
-                borderRadius: 999,
-              }}
-            />
-            <View style={{ gap: 4 }}>
-              <Form.Text style={Form.FormFont.default}>Alex's iPhone</Form.Text>
-              <Form.Text style={Form.FormFont.caption}>
-                This iPhone 16 Pro Max
-              </Form.Text>
-            </View>
-            <View style={{ flex: 1 }} />
-            <Image
-              source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
-              // source="sf:person.fill.badge.plus"
-              style={{
-                aspectRatio: 1,
-                height: 48,
-                borderRadius: 999,
-              }}
-              animationSpec={{
-                effect: {
-                  type: "pulse",
-                },
-                repeating: true,
-              }}
-            />
-            <Image
-              // source="sf:person.fill.badge.plus"
-              source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
-              tintColor={AC.systemBlue}
-              size={24}
-              animationSpec={{
-                effect: {
-                  type: "pulse",
-                },
-                repeating: true,
-              }}
-            />
-          </Form.HStack>
-        </Form.Section>
-        <Form.Section
-          title={t('links')}
-          footer={
-            <Text>
-              Help improve Search by allowing Apple to store the searches you
-              enter into Safari, Siri, and Spotlight in a way that is not linked
-              to you.{"\n\n"}Searches include lookups of general knowledge, and
-              requests to do things like play music and get directions.{"\n"}
-              <Link style={{ color: AC.link }} href="/modal">
-                {t('aboutSearchPrivacy')}
-              </Link>
-            </Text>
-          }
-        >
-          <Form.Link target="_blank" href="https://getmycompanion.com">
-            <Form.Text>Website</Form.Text>
-          </Form.Link>
-          <Form.Link href="/modal">
-            <View style={{ gap: 4 }}>
-              <Form.Text>Alex's iPhone</Form.Text>
-              <Text style={Form.FormFont.caption}>This iPhone 16 Pro Max</Text>
-            </View>
-          </Form.Link>
-          <Link href="/modal">
-            <View style={{ gap: 4 }}>
-              <Form.Text>Alex's iPhone</Form.Text>
-              <Text style={Form.FormFont.caption}>This iPhone 16 Pro Max</Text>
-            </View>
-          </Link>
-        </Form.Section> */}
+        </Form.Section>        
       </Form.List>
     </View>
   );
-  // return (
-  //   <View className="justify-center flex-1 p-4">
-  //     <AppText center size="heading">
-  //       Home Screen
-  //     </AppText>
-  //     <Link asChild push href="/modal">
-  //       <Button title="Open modal" />
-  //     </Link>
-  //   </View>
-  // );
-}
-function SegmentsTest() {
-  const { t } = useI18n();
-
-  return (
-    <View style={{ flex: 1 }}>
-      <Segments defaultValue="account">
-        <SegmentsList>
-          <SegmentsTrigger value="connexion">{t('connection')}</SegmentsTrigger>
-          <SegmentsTrigger value="inscription">{t('registration')}</SegmentsTrigger>
-        </SegmentsList>
-
-        <SegmentsContent value="connexion">
-          <Form.Section title="">
-            <TextInput placeholder={t('email')} />
-            <Form.TextField placeholder={t('password')} />
-          </Form.Section>
-        </SegmentsContent>
-        <SegmentsContent value="inscription">
-          <Form.Section title="">
-            <TextInput placeholder={t('email')} />
-            <Form.TextField placeholder={t('password')} />
-            <Form.TextField placeholder={t('confirmPassword')} />
-          </Form.Section>
-        </SegmentsContent>
-      </Segments>
-    </View>
-  );
 }
 
-export function TripleItemTest() {
-  const { t } = useI18n();
-  
-  return (
-    <>
-      <HorizontalItem title={t('expires')} badge="88" subtitle={t('days')} />
 
-      <View
-        style={{
-          backgroundColor: AC.separator,
-          width: 0.5,
-          maxHeight: "50%",
-          minHeight: "50%",
-          marginVertical: "auto",
-        }}
-      />
-
-      <HorizontalItem
-        title={t('designedWith')}
-        badge="❤️"
-        subtitle={t('forOurSeniors')}
-      />
-
-      <View
-        style={{
-          backgroundColor: AC.separator,
-          width: 0.5,
-          maxHeight: "50%",
-          minHeight: "50%",
-          marginVertical: "auto",
-        }}
-      />
-
-      <HorizontalItem title={t('version')} badge="3.6" subtitle={`${t('build')} 250`} />
-    </>
-  );
-}
-
-function HorizontalItem({
-  title,
-  badge,
-  subtitle,
-}: {
-  title: string;
-  badge: React.ReactNode;
-  subtitle: string;
-}) {
-  return (
-    <View style={{ alignItems: "center", gap: 4, flex: 1 }}>
-      <Form.Text
-        style={{
-          textTransform: "uppercase",
-          fontSize: 10,
-          fontWeight: "600",
-          color: AC.secondaryLabel,
-        }}
-      >
-        {title}
-      </Form.Text>
-      {typeof badge === "string" ? (
-        <Form.Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            color: AC.secondaryLabel,
-          }}
-        >
-          {badge}
-        </Form.Text>
-      ) : (
-        badge
-      )}
-
-      <Form.Text
-        style={{
-          fontSize: 12,
-          color: AC.secondaryLabel,
-        }}
-      >
-        {subtitle}
-      </Form.Text>
-    </View>
-  );
-}

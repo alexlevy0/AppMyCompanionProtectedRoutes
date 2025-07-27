@@ -16,30 +16,55 @@ const getDefaultNotificationSettings = (): NotificationSettings => ({
 });
 
 export default function ModalScreenScreen() {
-  const { user, updateNotificationSettings } = useAuthStoreObserver();
+  const { user, updateNotificationSettings, isLoadingUser } = useAuthStoreObserver();
 
   // Initialize state from store or defaults
   const [notificationSettings, setNotificationSettings] =
     useState<NotificationSettings>(getDefaultNotificationSettings());
   const [isInitialized, setIsInitialized] = useState(false);
+  const [hasLoadedFromUser, setHasLoadedFromUser] = useState(false);
 
-  // Load settings from store on mount (only once)
+  // Load settings from store on mount and when user changes
   useEffect(() => {
-    if (user?.notificationSettings && !isInitialized) {
-      setNotificationSettings(user.notificationSettings);
+    console.log('🔄 Notification settings effect triggered:', {
+      isLoadingUser,
+      hasUser: !!user,
+      hasNotificationSettings: !!user?.notificationSettings,
+      isInitialized,
+      hasLoadedFromUser
+    });
+    
+    // Attendre que l'utilisateur soit chargé
+    if (!isLoadingUser && user && !hasLoadedFromUser) {
+      if (user.notificationSettings) {
+        console.log('🔄 Loading notification settings from user:', user.notificationSettings);
+        setNotificationSettings(user.notificationSettings);
+      } else {
+        // Si l'utilisateur est chargé mais n'a pas de notification settings, utiliser les défauts
+        console.log('🔄 No notification settings found, using defaults');
+        setNotificationSettings(getDefaultNotificationSettings());
+      }
       setIsInitialized(true);
-    } else if (!user?.notificationSettings && !isInitialized) {
-      // If no settings exist, mark as initialized to avoid infinite loop
-      setIsInitialized(true);
+      setHasLoadedFromUser(true);
     }
-  }, [user?.notificationSettings, isInitialized]);
+  }, [user, isLoadingUser, hasLoadedFromUser]);
 
   // Save settings to store whenever they change (only after initialization)
   useEffect(() => {
-    if (isInitialized) {
+    if (isInitialized && user && hasLoadedFromUser) {
+      console.log('💾 Saving notification settings:', notificationSettings);
       updateNotificationSettings(notificationSettings);
     }
-  }, [notificationSettings, updateNotificationSettings, isInitialized]);
+  }, [notificationSettings, updateNotificationSettings, isInitialized, user, hasLoadedFromUser]);
+
+  // Show loading state while user is being loaded
+  if (isLoadingUser) {
+    return (
+      <View className="flex-1 p-4 justify-center items-center" style={{ backgroundColor: AC.systemGroupedBackground }}>
+        <AppText>Chargement des paramètres...</AppText>
+      </View>
+    );
+  }
 
   // Handlers
   const handleToggleSetting = (

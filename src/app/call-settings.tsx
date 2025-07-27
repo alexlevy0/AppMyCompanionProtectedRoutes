@@ -2,11 +2,12 @@ import { View } from "react-native";
 import * as Form from "@/components/ui/form";
 import { Pressable } from "react-native";
 import * as AC from "@bacons/apple-colors";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { TimeSlot, DaySchedule, CallSettings } from "@/types";
 import { useI18n } from "@/utils/I18nContext";
+import { AppText } from "@/components/AppText";
 
 // Constants
 const TIME_SLOTS = [
@@ -108,7 +109,7 @@ const DayScheduleItem = ({
 };
 
 export default function CallSettingsScreen() {
-  const { user, updateCallSettings } = useAuthStoreObserver();
+  const { user, updateCallSettings, isLoadingUser } = useAuthStoreObserver();
   const { t } = useI18n();
   
   // Définir les jours de la semaine avec les traductions
@@ -122,104 +123,159 @@ export default function CallSettingsScreen() {
     t('sunday'),
   ], [t]);
   
-  // Fonction pour obtenir les schedules par défaut
-  const getDefaultSchedules = useMemo(() => (): Record<string, DaySchedule> =>
-    DAYS_OF_WEEK.reduce(
-      (acc, day) => ({
-        ...acc,
-        [day]: { name: day, enabled: false, timeSlot: "9:00-12:00" },
-      }),
-      {} as Record<string, DaySchedule>
-    ), [DAYS_OF_WEEK]);
-  
+  // Fonction pour obtenir les schedules par défaut - stabilisée avec useCallback
+  const getDefaultSchedules = useCallback((): Record<string, DaySchedule> => {
+    // Utiliser des clés numériques pour éviter les problèmes de traduction
+    const numericSchedules: Record<string, DaySchedule> = {};
+    DAYS_OF_WEEK.forEach((day, index) => {
+      numericSchedules[index.toString()] = { 
+        name: day, 
+        enabled: false, 
+        timeSlot: "9:00-12:00" 
+      };
+    });
+    return numericSchedules;
+  }, [DAYS_OF_WEEK]);
+
+  // Fonction pour convertir les schedules avec noms en schedules numériques
+  const convertToNumericSchedules = useCallback((namedSchedules: Record<string, DaySchedule>): Record<string, DaySchedule> => {
+    const numericSchedules: Record<string, DaySchedule> = {};
+    const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    dayOrder.forEach((dayName, index) => {
+      // Trouver le schedule correspondant dans les anciennes données
+      const oldKey = Object.keys(namedSchedules).find(key => 
+        key.toLowerCase().includes(dayName.toLowerCase()) || dayName.toLowerCase().includes(key.toLowerCase())
+      );
+      
+      if (oldKey && namedSchedules[oldKey]) {
+        numericSchedules[index.toString()] = {
+          ...namedSchedules[oldKey],
+          name: DAYS_OF_WEEK[index] // Utiliser le nom traduit actuel
+        };
+      } else {
+        numericSchedules[index.toString()] = {
+          name: DAYS_OF_WEEK[index],
+          enabled: false,
+          timeSlot: "9:00-12:00"
+        };
+      }
+    });
+    
+    return numericSchedules;
+  }, [DAYS_OF_WEEK]);
+
   // Initialize state from store or defaults
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
-  const [schedules, setSchedules] = useState<Record<string, DaySchedule>>(() => {
-    // Initialiser avec des schedules par défaut dès le début
-    return DAYS_OF_WEEK.length > 0 ? getDefaultSchedules() : {};
-  });
+  const [schedules, setSchedules] = useState<Record<string, DaySchedule>>({});
   const [isInitialized, setIsInitialized] = useState(false);
+  const [hasLoadedFromUser, setHasLoadedFromUser] = useState(false);
 
-  // Initialiser les schedules avec les valeurs par défaut dès que DAYS_OF_WEEK est disponible
-  useEffect(() => {
-    if (DAYS_OF_WEEK.length > 0 && Object.keys(schedules).length === 0) {
-      setSchedules(getDefaultSchedules());
-    }
-  }, [DAYS_OF_WEEK, getDefaultSchedules]);
+  // Fonction pour obtenir le schedule d'un jour par son index
+  const getScheduleByIndex = useCallback((index: number): DaySchedule | undefined => {
+    return schedules[index.toString()];
+  }, [schedules]);
 
-  // Load settings from store on mount (only once)
+  // Load settings from store on mount and when user changes
   useEffect(() => {
-    if (!isInitialized) {
-      if (user?.callSettings) {
-        setTimezone(user.callSettings.timezone);
-        setSchedules(user.callSettings.schedules);
+    console.log('🔄 Call settings effect triggered:', {
+      isLoadingUser,
+      hasUser: !!user,
+      hasCallSettings: !!user?.callSettings,
+      daysOfWeekLength: DAYS_OF_WEEK.length,
+      isInitialized,
+      hasLoadedFromUser
+    });
+    
+    // Attendre que l'utilisateur soit chargé et que les jours soient disponibles
+    if (!isLoadingUser && user && DAYS_OF_WEEK.length > 0 && !hasLoadedFromUser) {
+      if (user.callSettings) {
+        console.log('🔄 Loading call settings from user:', user.callSettings);
+        setTimezone(user.callSettings.timezone || DEFAULT_TIMEZONE);
+        
+        // Vérifier si les schedules sont déjà au format numérique
+        const existingSchedules = user.callSettings.schedules;
+        const hasNumericKeys = Object.keys(existingSchedules).every(key => !isNaN(parseInt(key)));
+        
+        if (hasNumericKeys) {
+          // Les schedules sont déjà au format numérique, les utiliser directement
+          console.log('🔄 Schedules already in numeric format, using directly');
+          setSchedules(existingSchedules);
+        } else {
+          // Convertir les anciens schedules nommés en schedules numériques
+          console.log('🔄 Converting named schedules to numeric format');
+          const numericSchedules = convertToNumericSchedules(existingSchedules);
+          console.log('🔄 Converted to numeric schedules:', numericSchedules);
+          setSchedules(numericSchedules);
+        }
       } else {
-        // Initialize with default schedules if no settings exist
+        // Si l'utilisateur est chargé mais n'a pas de call settings, initialiser avec les défauts
+        console.log('🔄 No call settings found, initializing with defaults');
         setSchedules(getDefaultSchedules());
       }
       setIsInitialized(true);
+      setHasLoadedFromUser(true);
     }
-  }, [user?.callSettings, isInitialized, getDefaultSchedules]);
+  }, [user, isLoadingUser, DAYS_OF_WEEK, getDefaultSchedules, convertToNumericSchedules, hasLoadedFromUser]);
 
   // Save settings to store whenever they change (only after initialization)
   useEffect(() => {
-    if (isInitialized && Object.keys(schedules).length > 0) {
+    if (isInitialized && Object.keys(schedules).length > 0 && user && hasLoadedFromUser) {
       const callSettings: CallSettings = {
         timezone,
         schedules,
       };
+      console.log('💾 Saving call settings:', callSettings);
       updateCallSettings(callSettings);
     }
-  }, [timezone, schedules, updateCallSettings, isInitialized]);
+  }, [timezone, schedules, updateCallSettings, isInitialized, user, hasLoadedFromUser]);
 
-  // Update schedules when days of week change (language change)
+  // Update schedules when days of week change (language change) - now using numeric keys
   useEffect(() => {
-    if (isInitialized && DAYS_OF_WEEK.length > 0) {
-      const currentDayKeys = Object.keys(schedules);
-      const newSchedules: Record<string, DaySchedule> = {};
-      
-      // Vérifier si les clés ont changé (changement de langue)
-      const hasChanged = DAYS_OF_WEEK.some((day, index) => {
-        const oldDayKey = currentDayKeys[index];
-        return oldDayKey !== day;
+    if (isInitialized && DAYS_OF_WEEK.length > 0 && hasLoadedFromUser) {
+      // Mettre à jour les noms des jours dans les schedules existants
+      const updatedSchedules: Record<string, DaySchedule> = {};
+      Object.keys(schedules).forEach(key => {
+        const index = parseInt(key);
+        if (!isNaN(index) && DAYS_OF_WEEK[index]) {
+          updatedSchedules[key] = {
+            ...schedules[key],
+            name: DAYS_OF_WEEK[index] // Mettre à jour le nom traduit
+          };
+        }
       });
       
-      if (hasChanged) {
-        // Migrer les schedules existants vers les nouveaux noms de jours
-        DAYS_OF_WEEK.forEach((day, index) => {
-          const oldDayKey = currentDayKeys[index];
-          if (oldDayKey && schedules[oldDayKey]) {
-            // Préserver les paramètres existants
-            newSchedules[day] = {
-              ...schedules[oldDayKey],
-              name: day // Mettre à jour le nom avec la nouvelle langue
-            };
-          } else {
-            // Créer un nouveau schedule par défaut
-            newSchedules[day] = { name: day, enabled: false, timeSlot: "9:00-12:00" };
-          }
-        });
-        
-        setSchedules(newSchedules);
+      if (JSON.stringify(updatedSchedules) !== JSON.stringify(schedules)) {
+        console.log('🔄 Updating day names in schedules:', updatedSchedules);
+        setSchedules(updatedSchedules);
       }
     }
-  }, [DAYS_OF_WEEK, isInitialized]);
+  }, [DAYS_OF_WEEK, isInitialized, hasLoadedFromUser, schedules]);
+
+  // Show loading state while user is being loaded
+  if (isLoadingUser) {
+    return (
+      <View className="flex-1 p-4 justify-center items-center" style={{ backgroundColor: AC.systemGroupedBackground }}>
+        <AppText>Chargement des paramètres...</AppText>
+      </View>
+    );
+  }
 
   // Handlers
-  const handleToggleDay = (day: string, enabled: boolean) => {
+  const handleToggleDay = (dayIndex: number, enabled: boolean) => {
     setSchedules((prev) => ({
       ...prev,
-      [day]: {
-        ...prev[day],
+      [dayIndex.toString()]: {
+        ...prev[dayIndex.toString()],
         enabled,
       },
     }));
   };
 
-  const handleTimeSelect = (day: string, timeSlot: TimeSlot) => {
+  const handleTimeSelect = (dayIndex: number, timeSlot: TimeSlot) => {
     setSchedules((prev) => ({
       ...prev,
-      [day]: { ...prev[day], timeSlot },
+      [dayIndex.toString()]: { ...prev[dayIndex.toString()], timeSlot },
     }));
   };
 
@@ -235,13 +291,13 @@ export default function CallSettingsScreen() {
         </Form.Link>
       </Form.Section>
       <Form.Section title={t('daysOfWeek')}>
-        {DAYS_OF_WEEK.map((day) => (
+        {DAYS_OF_WEEK.map((day, index) => (
           <DayScheduleItem
             key={day}
             day={day}
-            schedule={schedules[day]}
-            onToggle={(enabled) => handleToggleDay(day, enabled)}
-            onTimeSelect={(time) => handleTimeSelect(day, time)}
+            schedule={schedules[index.toString()]}
+            onToggle={(enabled) => handleToggleDay(index, enabled)}
+            onTimeSelect={(time) => handleTimeSelect(index, time)}
           />
           ))}
         </Form.Section>

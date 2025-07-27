@@ -151,41 +151,48 @@ export const authActions = {
     authState$._hasHydrated.set(value)
   },
 
-  updateCallSettings: (settings: CallSettings) => {
+  updateCallSettings: async (settings: CallSettings) => {
     const currentUserId = authState$.currentUserId.get()
     if (currentUserId) {
-      updateUserCallSettings(currentUserId, settings)
+      await updateUserCallSettings(currentUserId, settings)
     }
   },
 
-  updateNotificationSettings: (settings: NotificationSettings) => {
+  updateNotificationSettings: async (settings: NotificationSettings) => {
     const currentUserId = authState$.currentUserId.get()
     if (currentUserId) {
-      updateUserNotificationSettings(currentUserId, settings)
+      await updateUserNotificationSettings(currentUserId, settings)
     }
   },
 
-  updateSelectedContact: (contact: SelectedContact) => {
+  updateSelectedContact: async (contact: SelectedContact) => {
     console.log('🔍 updateSelectedContact called with:', contact)
     const currentUserId = authState$.currentUserId.get()
     console.log('🔍 Current user ID:', currentUserId)
     if (currentUserId) {
-      updateUserSelectedContact(currentUserId, contact)
+      await updateUserSelectedContact(currentUserId, contact)
     } else {
       console.warn('⚠️ No current user ID found')
     }
   },
 
-  removeSelectedContact: () => {
+  removeSelectedContact: async () => {
     const currentUserId = authState$.currentUserId.get()
     if (currentUserId) {
-      updateUserSelectedContact(currentUserId, undefined)
+      await updateUserSelectedContact(currentUserId, undefined)
     }
   },
 }
 
 // Fonction pour mapper un utilisateur Supabase vers un utilisateur de l'app
 function mapSupabaseUserToAppUser(supabaseUser: any): User {
+  console.log('🔄 Mapping Supabase user to app user:', {
+    id: supabaseUser.id,
+    call_settings: supabaseUser.call_settings,
+    notification_settings: supabaseUser.notification_settings,
+    selected_contact: supabaseUser.selected_contact
+  });
+  
   return {
     id: supabaseUser.id,
     name: supabaseUser.name,
@@ -223,29 +230,34 @@ export const useAuthStoreObserver = () => {
   
   // Charger l'utilisateur de manière asynchrone
   React.useEffect(() => {
-    if (currentUserId) {
-      setIsLoadingUser(true)
-      
-      // D'abord essayer de récupérer depuis l'observable local
-      const localUser = getUserByIdSync(currentUserId)
-      
-      if (localUser) {
-        setUser(localUser)
-        setIsLoadingUser(false)
-      } else {
-        // Si pas dans l'observable local, charger depuis Supabase
-        getUserById(currentUserId).then((supabaseUser) => {
-          setUser(supabaseUser)
-          setIsLoadingUser(false)
-        }).catch((error) => {
+    const loadUser = async () => {
+      if (currentUserId) {
+        setIsLoadingUser(true)
+        
+        try {
+          // D'abord essayer de récupérer depuis l'observable local
+          const localUser = getUserByIdSync(currentUserId)
+          
+          if (localUser) {
+            setUser(localUser)
+            setIsLoadingUser(false)
+          } else {
+            // Si pas dans l'observable local, charger depuis Supabase
+            const supabaseUser = await getUserById(currentUserId)
+            setUser(supabaseUser)
+            setIsLoadingUser(false)
+          }
+        } catch (error) {
           console.error('Error loading user:', error)
           setIsLoadingUser(false)
-        })
+        }
+      } else {
+        setUser(null)
+        setIsLoadingUser(false)
       }
-    } else {
-      setUser(null)
-      setIsLoadingUser(false)
     }
+    
+    loadUser()
   }, [currentUserId])
   
   // Écouter les changements de l'observable users$ pour l'utilisateur actuel
@@ -287,22 +299,33 @@ export const useAuthStoreObserver = () => {
 // Configuration de la persistance
 if (!isSSR) {
   // Charger l'état depuis AsyncStorage au démarrage
-  AsyncStorage.getItem('auth-state').then((savedState) => {
-    if (savedState) {
-      try {
+  const loadAuthState = async () => {
+    try {
+      const savedState = await AsyncStorage.getItem('auth-state')
+      if (savedState) {
         const parsedState = JSON.parse(savedState)
         authState$.set(parsedState)
         console.log('Auth state loaded from storage:', parsedState)
-      } catch (error) {
-        console.error('Error loading auth state:', error)
       }
+    } catch (error) {
+      console.error('Error loading auth state:', error)
     }
-  })
+  }
+  
+  loadAuthState()
 
   // Sauvegarder l'état à chaque changement
   authState$.onChange(({ value }) => {
-    AsyncStorage.setItem('auth-state', JSON.stringify(value))
-    console.log('Auth state saved to storage:', value)
+    const saveAuthState = async () => {
+      try {
+        await AsyncStorage.setItem('auth-state', JSON.stringify(value))
+        console.log('Auth state saved to storage:', value)
+      } catch (error) {
+        console.error('Error saving auth state:', error)
+      }
+    }
+    
+    saveAuthState()
   })
   
   console.log('Auth state persistence configured')
