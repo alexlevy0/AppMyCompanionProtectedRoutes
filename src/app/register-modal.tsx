@@ -1,9 +1,11 @@
-import { View, TextInput, Alert, ScrollView } from "react-native";
+import { View, TextInput, Alert, ScrollView, Pressable, KeyboardAvoidingView, Platform } from "react-native";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
 import { useAuthStore } from "@/utils/authStore";
 import { useState } from "react";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RegisterModal() {
   const { register } = useAuthStore();
@@ -15,29 +17,41 @@ export default function RegisterModal() {
     phone: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Le nom est requis";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "L'email est requis";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Format d'email invalide";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Le mot de passe est requis";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Minimum 6 caractères";
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Confirmation requise";
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Les mots de passe ne correspondent pas";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleRegister = async () => {
-    // Validation
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      Alert.alert(
-        "Erreur",
-        "Le mot de passe doit contenir au moins 6 caractères",
-      );
+    if (!validateForm()) {
       return;
     }
 
@@ -50,7 +64,6 @@ export default function RegisterModal() {
         phone: formData.phone || undefined,
       });
 
-      console.log("result", result);
       if (result.success) {
         Alert.alert(
           "Succès",
@@ -72,88 +85,200 @@ export default function RegisterModal() {
     }
   };
 
-  return (
-    <View className="flex-1 bg-white">
-      <ScrollView className="flex-1 p-4">
-        <View className="space-y-4">
-          <View>
-            <AppText className="mb-2">Nom complet *</AppText>
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-white"
-              placeholder="Entrez votre nom complet"
-              value={formData.name}
-              onChangeText={(text) => setFormData({ ...formData, name: text })}
-              autoCapitalize="words"
-              autoCorrect={false}
+  const renderInput = (
+    label: string,
+    value: string,
+    onChangeText: (text: string) => void,
+    placeholder: string,
+    error?: string,
+    keyboardType?: "default" | "email-address" | "phone-pad",
+    isPassword?: boolean,
+    showPasswordToggle?: boolean,
+    isPasswordVisible?: boolean,
+    onTogglePassword?: () => void,
+    required?: boolean
+  ) => (
+    <View className="mb-5">
+      <AppText className="mb-2 text-gray-700 font-medium">
+        {label} {required && <AppText className="text-red-500">*</AppText>}
+      </AppText>
+      <View className="relative">
+        <TextInput
+          className={`border-2 rounded-xl px-4 py-4 bg-gray-50 text-base ${
+            error ? "border-red-400" : "border-gray-200 focus:border-blue-500"
+          } ${isPassword && showPasswordToggle ? "pr-12" : ""}`}
+          placeholder={placeholder}
+          placeholderTextColor="#9CA3AF"
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={keyboardType}
+          secureTextEntry={isPassword && !isPasswordVisible}
+          autoCapitalize={isPassword ? "none" : keyboardType === "email-address" ? "none" : "words"}
+          autoCorrect={false}
+        />
+        {isPassword && showPasswordToggle && (
+          <Pressable
+            onPress={onTogglePassword}
+            className="absolute right-4 top-4"
+          >
+            <Ionicons
+              name={isPasswordVisible ? "eye-off" : "eye"}
+              size={24}
+              color="#6B7280"
             />
-          </View>
-
-          <View>
-            <AppText className="mb-2">Email *</AppText>
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-white"
-              placeholder="Entrez votre email"
-              value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          <View>
-            <AppText className="mb-2">Téléphone</AppText>
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-white"
-              placeholder="Entrez votre numéro de téléphone"
-              value={formData.phone}
-              onChangeText={(text) => setFormData({ ...formData, phone: text })}
-              keyboardType="phone-pad"
-              autoCorrect={false}
-            />
-          </View>
-
-          <View>
-            <AppText className="mb-2">Mot de passe *</AppText>
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-white"
-              placeholder="Entrez votre mot de passe"
-              value={formData.password}
-              onChangeText={(text) => setFormData({ ...formData, password: text })}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          <View>
-            <AppText className="mb-2">Confirmer le mot de passe *</AppText>
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 bg-white"
-              placeholder="Confirmez votre mot de passe"
-              value={formData.confirmPassword}
-              onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-        </View>
-
-        <View className="mt-6">
-          <Button
-            title={isLoading ? "Inscription..." : "S'inscrire"}
-            onPress={handleRegister}
-            disabled={isLoading}
-          />
-        </View>
-
-        <View className="mt-4">
-          <AppText center className="text-gray-600 text-sm">
-            En vous inscrivant, vous acceptez nos conditions d'utilisation
-          </AppText>
-        </View>
-      </ScrollView>
+          </Pressable>
+        )}
+      </View>
+      {error && (
+        <AppText className="text-red-500 text-sm mt-1">{error}</AppText>
+      )}
     </View>
+  );
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="p-6 flex-1">
+            {/* Header */}
+            <View className="mb-8">
+              <AppText size="heading" className="text-gray-900 font-bold mb-2">
+                Créer un compte
+              </AppText>
+              <AppText className="text-gray-600">
+                Rejoignez-nous et commencez votre aventure
+              </AppText>
+            </View>
+
+            {/* Form */}
+            <View className="flex-1">
+              {renderInput(
+                "Nom complet",
+                formData.name,
+                (text) => setFormData({ ...formData, name: text }),
+                "John Doe",
+                errors.name,
+                "default",
+                false,
+                false,
+                false,
+                undefined,
+                true
+              )}
+
+              {renderInput(
+                "Email",
+                formData.email,
+                (text) => setFormData({ ...formData, email: text }),
+                "john@example.com",
+                errors.email,
+                "email-address",
+                false,
+                false,
+                false,
+                undefined,
+                true
+              )}
+
+              {renderInput(
+                "Téléphone",
+                formData.phone,
+                (text) => setFormData({ ...formData, phone: text }),
+                "+33 6 12 34 56 78",
+                errors.phone,
+                "phone-pad"
+              )}
+
+              {renderInput(
+                "Mot de passe",
+                formData.password,
+                (text) => setFormData({ ...formData, password: text }),
+                "••••••••",
+                errors.password,
+                "default",
+                true,
+                true,
+                showPassword,
+                () => setShowPassword(!showPassword),
+                true
+              )}
+
+              {renderInput(
+                "Confirmer le mot de passe",
+                formData.confirmPassword,
+                (text) => setFormData({ ...formData, confirmPassword: text }),
+                "••••••••",
+                errors.confirmPassword,
+                "default",
+                true,
+                true,
+                showConfirmPassword,
+                () => setShowConfirmPassword(!showConfirmPassword),
+                true
+              )}
+
+              {/* Submit Button */}
+              <View className="mt-6">
+                <Pressable
+                  onPress={handleRegister}
+                  disabled={isLoading}
+                  className={`bg-blue-600 rounded-xl py-4 px-6 ${
+                    isLoading ? "opacity-70" : ""
+                  }`}
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    elevation: 3,
+                  }}
+                >
+                  <AppText className="text-white text-center font-semibold text-lg">
+                    {isLoading ? "Inscription en cours..." : "S'inscrire"}
+                  </AppText>
+                </Pressable>
+              </View>
+
+              {/* Terms */}
+              <View className="mt-6 px-4">
+                <AppText center className="text-gray-500 text-sm leading-5">
+                  En créant un compte, vous acceptez nos{" "}
+                  <AppText className="text-blue-600 underline">
+                    conditions d'utilisation
+                  </AppText>{" "}
+                  et notre{" "}
+                  <AppText className="text-blue-600 underline">
+                    politique de confidentialité
+                  </AppText>
+                </AppText>
+              </View>
+
+              {/* Sign In Link */}
+              <View className="mt-8 mb-4">
+                <Pressable
+                  onPress={() => router.push("/sign-in")}
+                  className="py-2"
+                >
+                  <AppText center className="text-gray-600">
+                    Déjà un compte ?{" "}
+                    <AppText className="text-blue-600 font-semibold">
+                      Se connecter
+                    </AppText>
+                  </AppText>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 } 

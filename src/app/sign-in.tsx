@@ -1,11 +1,12 @@
-import { View, TextInput, Alert } from "react-native";
+import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { AppText } from "@/components/AppText";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Button } from "@/components/Button";
 import { useAuthStore } from "@/utils/authStore";
 import { useState } from "react";
 import { useI18n } from "@/utils/I18nContext";
-import * as AC from "@bacons/apple-colors";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignInScreen() {
   const { logIn, logInAsVip } = useAuthStore();
@@ -13,10 +14,28 @@ export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!email.trim()) {
+      newErrors.email = t('emailRequired') || "L'email est requis";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = t('invalidEmailFormat') || "Format d'email invalide";
+    }
+
+    if (!password) {
+      newErrors.password = t('passwordRequired') || "Le mot de passe est requis";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert(t('error'), t('pleaseFillAllFields'));
+    if (!validateForm()) {
       return;
     }
 
@@ -37,78 +56,131 @@ export default function SignInScreen() {
   };
 
   return (
-    <View 
-      className="justify-center flex-1 p-4"
-      style={{ backgroundColor: AC.systemGroupedBackground }}
-    >
-      <AppText center size="heading" className="mb-8">
-        {t('connection')}
-      </AppText>
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="p-6 flex-1 justify-center">
+            {/* Header */}
+            <View className="mb-10">
+              <AppText size="heading" className="text-gray-900 font-bold mb-2 text-center">
+                {t('connection')}
+              </AppText>
+              <AppText className="text-gray-600 text-center">
+                {t('welcomeBack') || "Bienvenue ! Connectez-vous pour continuer"}
+              </AppText>
+            </View>
 
-      <View className="space-y-4 mb-6">
-        <View>
-          <AppText className="mb-2">{t('email')}</AppText>
-          <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: AC.separator,
-              borderRadius: 8,
-              padding: 12,
-              backgroundColor: AC.secondarySystemGroupedBackground,
-              color: AC.label,
-            }}
-            placeholder={`Entrez votre ${t('email').toLowerCase()}`}
-            placeholderTextColor={AC.tertiaryLabel}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </View>
+            {/* Form */}
+            <View>
+              {/* Email Input */}
+              <View className="mb-5">
+                <AppText className="mb-2 text-gray-700 font-medium">
+                  {t('email')}
+                </AppText>
+                <TextInput
+                  className={`border-2 rounded-xl px-4 py-4 bg-gray-50 text-base ${
+                    errors.email ? "border-red-400" : "border-gray-200 focus:border-blue-500"
+                  }`}
+                  placeholder="john@example.com"
+                  placeholderTextColor="#9CA3AF"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                {errors.email && (
+                  <AppText className="text-red-500 text-sm mt-1">{errors.email}</AppText>
+                )}
+              </View>
 
-        <View>
-          <AppText className="mb-2">{t('password')}</AppText>
-          <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: AC.separator,
-              borderRadius: 8,
-              padding: 12,
-              backgroundColor: AC.secondarySystemGroupedBackground,
-              color: AC.label,
-            }}
-            placeholder={`Entrez votre ${t('password').toLowerCase()}`}
-            placeholderTextColor={AC.tertiaryLabel}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </View>
-      </View>
+              {/* Password Input */}
+              <View className="mb-5">
+                <AppText className="mb-2 text-gray-700 font-medium">
+                  {t('password')}
+                </AppText>
+                <View className="relative">
+                  <TextInput
+                    className={`border-2 rounded-xl px-4 py-4 bg-gray-50 text-base pr-12 ${
+                      errors.password ? "border-red-400" : "border-gray-200 focus:border-blue-500"
+                    }`}
+                    placeholder="••••••••"
+                    placeholderTextColor="#9CA3AF"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-4"
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off" : "eye"}
+                      size={24}
+                      color="#6B7280"
+                    />
+                  </Pressable>
+                </View>
+                {errors.password && (
+                  <AppText className="text-red-500 text-sm mt-1">{errors.password}</AppText>
+                )}
+              </View>
 
-      <Button
-        title={isLoading ? t('sending') : t('signIn')}
-        onPress={handleLogin}
-        disabled={isLoading}
-      />
+              {/* Forgot Password Link */}
+              <Pressable className="mb-6">
+                <AppText className="text-blue-600 text-right font-medium">
+                  {t('forgotPassword') || "Mot de passe oublié ?"}
+                </AppText>
+              </Pressable>
 
-      <View className="mt-4 space-y-2">
-        <Link asChild href="/register-modal">
-          <Button title={t('signUp')} theme="secondary" />
-        </Link>
-        {/* <Button
-          title="Sign in as VIP 👑"
-          onPress={logInAsVip}
-          theme="secondary"
-        /> */}
-      </View>
+              {/* Submit Button */}
+              <Pressable
+                onPress={handleLogin}
+                disabled={isLoading}
+                className={`bg-blue-600 rounded-xl py-4 px-6 mb-4 ${
+                  isLoading ? "opacity-70" : ""
+                }`}
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+              >
+                <AppText className="text-white text-center font-semibold text-lg">
+                  {isLoading ? t('sending') : t('signIn')}
+                </AppText>
+              </Pressable>
 
-      {/* <Link asChild push href="/modal" className="mt-4">
-        <Button title="Open modal (disabled)" theme="secondary" />
-      </Link> */}
-    </View>
+              {/* Sign Up Link */}
+              <View className="mt-6">
+                <Pressable
+                  onPress={() => router.push("/register-modal")}
+                  className="py-2"
+                >
+                  <AppText center className="text-gray-600">
+                    {t('noAccount') || "Pas encore de compte ?"}{" "}
+                    <AppText className="text-blue-600 font-semibold">
+                      {t('signUp')}
+                    </AppText>
+                  </AppText>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
