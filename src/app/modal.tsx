@@ -34,6 +34,147 @@ import { BlurView } from 'expo-blur';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+// Helper functions
+const getInitials = (name: string) => {
+  const words = name.split(' ');
+  if (words.length >= 2) {
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
+const getColorForInitial = (initial: string) => {
+  const colors = [
+    AC.systemRed,
+    AC.systemBlue,
+    AC.systemGreen,
+    AC.systemOrange,
+    AC.systemPurple,
+    AC.systemPink,
+    AC.systemYellow,
+    AC.systemIndigo,
+    AC.systemTeal
+  ];
+  const index = initial.charCodeAt(0) % colors.length;
+  return colors[index];
+};
+
+// ContactItem component moved outside
+const ContactItem = ({ 
+  item, 
+  index, 
+  isSelected, 
+  onSelectContact 
+}: { 
+  item: SelectedContact; 
+  index: number;
+  isSelected: boolean;
+  onSelectContact: (contact: SelectedContact) => void;
+}) => {
+  const scale = useSharedValue(1);
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }]
+  }));
+
+  const initials = getInitials(item.name);
+  const avatarColor = getColorForInitial(initials[0]);
+
+  return (
+    <Animated.View
+      entering={FadeIn.delay(index * 50).springify()}
+      style={animatedStyle}
+    >
+      <Pressable
+        onPressIn={() => {
+          scale.value = withSpring(0.98);
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1);
+        }}
+        onPress={() => onSelectContact(item)}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 16,
+          marginHorizontal: 16,
+          marginVertical: 4,
+          backgroundColor: isSelected ? String(AC.systemBlue) + '15' : AC.systemBackground,
+          borderRadius: 12,
+          borderWidth: isSelected ? 2 : 1,
+          borderColor: isSelected ? AC.systemBlue : String(AC.separator) + '30',
+        }}
+      >
+        {/* Avatar */}
+        <View
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            backgroundColor: avatarColor,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 16,
+          }}
+        >
+          <Text style={{ 
+            color: 'white', 
+            fontSize: 18, 
+            fontWeight: '600' 
+          }}>
+            {initials}
+          </Text>
+        </View>
+
+        {/* Contact Info */}
+        <View style={{ flex: 1 }}>
+          <Text style={{ 
+            fontSize: 16, 
+            fontWeight: '600',
+            color: AC.label,
+            marginBottom: 4
+          }}>
+            {item.name}
+          </Text>
+          {item.phoneNumbers && item.phoneNumbers.length > 0 && (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons 
+                name="call-outline" 
+                size={14} 
+                color={AC.secondaryLabel} 
+                style={{ marginRight: 4 }}
+              />
+              <Text style={{ 
+                fontSize: 14,
+                color: AC.secondaryLabel
+              }}>
+                {item.phoneNumbers.length} {item.phoneNumbers.length > 1 ? 'numéros' : 'numéro'}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Selected Indicator */}
+        {isSelected && (
+          <Animated.View
+            entering={FadeIn.springify()}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: AC.systemBlue,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Ionicons name="checkmark" size={16} color="white" />
+          </Animated.View>
+        )}
+      </Pressable>
+    </Animated.View>
+  );
+};
+
 export default function ModalScreenScreen() {
   const { t } = useI18n();
   const { user, updateSelectedContact } = useAuthStore();
@@ -135,136 +276,6 @@ export default function ModalScreenScreen() {
     }, 300);
   };
 
-  const getInitials = (name: string) => {
-    const words = name.split(' ');
-    if (words.length >= 2) {
-      return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
-  };
-
-  const getColorForInitial = (initial: string) => {
-    const colors = [
-      AC.systemRed,
-      AC.systemBlue,
-      AC.systemGreen,
-      AC.systemOrange,
-      AC.systemPurple,
-      AC.systemPink,
-      AC.systemYellow,
-      AC.systemIndigo,
-      AC.systemTeal
-    ];
-    const index = initial.charCodeAt(0) % colors.length;
-    return colors[index];
-  };
-
-  const ContactItem = ({ item, index }: { item: SelectedContact; index: number }) => {
-    const scale = useSharedValue(1);
-    
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }]
-    }));
-
-    const isSelected = selectedContact?.id === item.id;
-    const initials = getInitials(item.name);
-    const avatarColor = getColorForInitial(initials[0]);
-
-    return (
-      <Animated.View
-        entering={FadeIn.delay(index * 50).springify()}
-        style={animatedStyle}
-      >
-        <Pressable
-          onPressIn={() => {
-            scale.value = withSpring(0.98);
-          }}
-          onPressOut={() => {
-            scale.value = withSpring(1);
-          }}
-          onPress={() => handleSelectContact(item)}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 16,
-            marginHorizontal: 16,
-            marginVertical: 4,
-            backgroundColor: isSelected ? AC.systemBlue + '15' : AC.systemBackground,
-            borderRadius: 12,
-            borderWidth: isSelected ? 2 : 1,
-            borderColor: isSelected ? AC.systemBlue : AC.separator + '30',
-          }}
-        >
-          {/* Avatar */}
-          <View
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 25,
-              backgroundColor: avatarColor,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: 16,
-            }}
-          >
-            <Text style={{ 
-              color: 'white', 
-              fontSize: 18, 
-              fontWeight: '600' 
-            }}>
-              {initials}
-            </Text>
-          </View>
-
-          {/* Contact Info */}
-          <View style={{ flex: 1 }}>
-            <Text style={{ 
-              fontSize: 16, 
-              fontWeight: '600',
-              color: AC.label,
-              marginBottom: 4
-            }}>
-              {item.name}
-            </Text>
-            {item.phoneNumbers && item.phoneNumbers.length > 0 && (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons 
-                  name="call-outline" 
-                  size={14} 
-                  color={AC.secondaryLabel} 
-                  style={{ marginRight: 4 }}
-                />
-                <Text style={{ 
-                  fontSize: 14,
-                  color: AC.secondaryLabel
-                }}>
-                  {item.phoneNumbers.length} {item.phoneNumbers.length > 1 ? t('phoneNumbersPlural') : t('phoneNumbers')}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {/* Selected Indicator */}
-          {isSelected && (
-            <Animated.View
-              entering={FadeIn.springify()}
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 12,
-                backgroundColor: AC.systemBlue,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Ionicons name="checkmark" size={16} color="white" />
-            </Animated.View>
-          )}
-        </Pressable>
-      </Animated.View>
-    );
-  };
-
   if (loading) {
     return (
       <View style={{ 
@@ -319,12 +330,14 @@ export default function ModalScreenScreen() {
             paddingBottom: 8,
             backgroundColor: AC.systemBackground,
             borderBottomWidth: 1,
-            borderBottomColor: AC.separator + '30',
+            borderBottomColor: String(AC.separator) + '30',
           }}
         >
-          <AppText center size="heading" style={{ marginBottom: 8 }}>
-            {t('selectContact')}
-          </AppText>
+          <View style={{ marginBottom: 8 }}>
+            <AppText center size="heading">
+              {t('selectContact')}
+            </AppText>
+          </View>
           <Text style={{ 
             textAlign: 'center',
             color: AC.secondaryLabel,
@@ -400,7 +413,14 @@ export default function ModalScreenScreen() {
         ) : (
           <FlatList
             data={filteredContacts}
-            renderItem={ContactItem}
+            renderItem={({ item, index }) => (
+              <ContactItem
+                item={item}
+                index={index}
+                isSelected={selectedContact?.id === item.id}
+                onSelectContact={handleSelectContact}
+              />
+            )}
             keyExtractor={(item) => item.id}
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingVertical: 8 }}
@@ -417,7 +437,7 @@ export default function ModalScreenScreen() {
               padding: 16,
               backgroundColor: AC.systemBackground,
               borderTopWidth: 1,
-              borderTopColor: AC.separator + '30',
+              borderTopColor: String(AC.separator) + '30',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -548,14 +568,14 @@ export default function ModalScreenScreen() {
                       paddingVertical: 16,
                       paddingHorizontal: 20,
                       borderBottomWidth: index < pendingContact.phoneNumbers!.length - 1 ? 1 : 0,
-                      borderBottomColor: AC.separator + '30',
+                      borderBottomColor: String(AC.separator) + '30',
                     }}
                   >
                     <View style={{
                       width: 40,
                       height: 40,
                       borderRadius: 20,
-                      backgroundColor: AC.systemBlue + '20',
+                      backgroundColor: String(AC.systemBlue) + '20',
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginRight: 16,
