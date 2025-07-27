@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import * as AC from "@bacons/apple-colors";
@@ -74,7 +74,7 @@ const MessageBubble = ({ message, formatTime }: { message: Message; formatTime: 
 };
 
 export default function ChatsScreen() {
-  const { logOut, resetOnboarding } = useAuthStore();
+  const { logOut, resetOnboarding } = useAuthStoreObserver();
   const { t } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
 

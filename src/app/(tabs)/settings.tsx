@@ -1,7 +1,7 @@
 import { View, Alert } from "react-native";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import * as Form from "@/components/ui/form";
 import { Link } from "expo-router";
 import { Text, Pressable } from "react-native";
@@ -15,7 +15,7 @@ import { TranslationTest } from "@/components/TranslationTest";
 import { DaysOfWeekTest } from "@/components/DaysOfWeekTest";
 
 export default function SettingsScreen() {
-  const { logOut, resetOnboarding } = useAuthStore();
+  const { logOut, resetOnboarding } = useAuthStoreObserver();
   const { t } = useI18n();
 
   return (
@@ -60,6 +60,11 @@ export default function SettingsScreen() {
           <Link href="/notifications-settings">
             <View style={{ gap: 4 }}>
               <Form.Text>{t('notifications')}</Form.Text>
+            </View>
+          </Link>
+          <Link href="/(tabs)/test-sync">
+            <View style={{ gap: 4 }}>
+              <Form.Text>Test Synchronisation</Form.Text>
             </View>
           </Link>
         </Form.Section>
