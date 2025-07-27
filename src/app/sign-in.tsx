@@ -2,14 +2,17 @@ import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform, Scro
 import { AppText } from "@/components/AppText";
 import { Link, router } from "expo-router";
 import { Button } from "@/components/Button";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { useState } from "react";
 import { useI18n } from "@/utils/I18nContext";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as AC from "@bacons/apple-colors";
+import { router } from "expo-router";
+import { observer } from '@legendapp/state/react';
 
-export default function SignInScreen() {
-  const { logIn, logInAsVip } = useAuthStore();
+export default observer(function SignInScreen() {
+  const { logIn, logInAsVip, isLoggedIn } = useAuthStoreObserver();
   const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,14 +44,33 @@ export default function SignInScreen() {
 
     setIsLoading(true);
     try {
+      console.log('Attempting login with:', email);
       const result = await logIn(email, password);
+      console.log('Login result:', result);
 
       if (result.success) {
-        Alert.alert(t('success'), t('connectionSuccessful'));
+        console.log('Login successful, redirecting...');
+        console.log('isLoggedIn state:', isLoggedIn);
+        
+        // Redirection immédiate sans alert
+        console.log('Forcing immediate redirect to tabs...');
+        try {
+          router.push('/(tabs)');
+        } catch (error) {
+          console.error('Router error:', error);
+          // Fallback: essayer avec replace
+          router.replace('/(tabs)');
+        }
+        
+        // Alert après redirection
+        setTimeout(() => {
+          Alert.alert(t('success'), t('connectionSuccessful'));
+        }, 100);
       } else {
         Alert.alert(t('error'), result.error || t('connectionFailed'));
       }
     } catch (error) {
+      console.error('Login error:', error);
       Alert.alert(t('error'), t('anErrorOccurred'));
     } finally {
       setIsLoading(false);
@@ -142,7 +164,6 @@ export default function SignInScreen() {
                   {t('forgotPassword') || "Mot de passe oublié ?"}
                 </AppText>
               </Pressable>
-
               {/* Submit Button */}
               <Pressable
                 onPress={handleLogin}
@@ -162,7 +183,6 @@ export default function SignInScreen() {
                   {isLoading ? t('sending') : t('signIn')}
                 </AppText>
               </Pressable>
-
               {/* Sign Up Link */}
               <View className="mt-6">
                 <Pressable
@@ -183,4 +203,4 @@ export default function SignInScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+});

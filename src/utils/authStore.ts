@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { getItem, setItem, deleteItemAsync } from "expo-secure-store";
 import { Platform } from "react-native";
-import { login } from "./login";
-import { register } from "./register";
 import {
   UserData,
   UserState,
@@ -11,10 +9,6 @@ import {
   NotificationSettings,
   SelectedContact,
 } from "@/types";
-
-// Constants
-export const AUTH_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxBlSRVwQfIyjDXoMBD3B0R7cmaHkBPv1IBOJS4nI3aX-lbEASF7hYyn8YPInBl1B8s/exec";
 
 // Utility functions
 export function hashPassword(password: string): string {
@@ -75,31 +69,35 @@ export const useAuthStore = create(
       user: null,
 
       logIn: async (email: string, password: string) => {
-        const result = await login(email, password);
-        if (result.success && result.user) {
-          set((state) => ({
-            ...state,
-            isLoggedIn: true,
-            user: result.user,
-          }));
-        }
-        return result;
+        // const result = await login(email, password); // login and register are removed
+        // if (result.success && result.user) {
+        //   set((state) => ({
+        //     ...state,
+        //     isLoggedIn: true,
+        //     user: result.user,
+        //   }));
+        // }
+        // return result;
+        console.warn("logIn function is not implemented as login/register are removed.");
+        return { success: false, message: "Authentication not available." };
       },
 
       register: async (userData: UserData) => {
-        const result = await register(userData);
-        if (result.success) {
-          set((state) => ({
-            ...state,
-            isLoggedIn: true,
-            user: {
-              id: generateUserId(),
-              name: userData.name,
-              email: userData.email,
-            },
-          }));
-        }
-        return result;
+        // const result = await register(userData); // login and register are removed
+        // if (result.success) {
+        //   set((state) => ({
+        //     ...state,
+        //     isLoggedIn: true,
+        //     user: {
+        //       id: generateUserId(),
+        //       name: userData.name,
+        //       email: userData.email,
+        //     },
+        //   }));
+        // }
+        // return result;
+        console.warn("register function is not implemented as login/register are removed.");
+        return { success: false, message: "Registration not available." };
       },
 
       logInAsVip: () => {

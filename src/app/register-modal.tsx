@@ -1,14 +1,14 @@
 import { View, TextInput, Alert, ScrollView, Pressable, KeyboardAvoidingView, Platform } from "react-native";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { useState } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RegisterModal() {
-  const { register } = useAuthStore();
+  const { register } = useAuthStoreObserver();
   const [formData, setFormData] = useState({
     name: "",
     email: "",

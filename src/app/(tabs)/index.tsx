@@ -33,11 +33,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useI18n } from "@/utils/I18nContext";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 
 export default function IndexScreen() {
   const { t } = useI18n();
-  const { user, removeSelectedContact } = useAuthStore();
+  const { user, removeSelectedContact, updateSelectedContact, logInAsVip } = useAuthStoreObserver();
 
   const handleRemoveContact = () => {
     Alert.alert(
@@ -55,6 +55,59 @@ export default function IndexScreen() {
         },
       ]
     );
+  };
+
+  const handleTestContactUpdate = () => {
+    console.log('🧪 Testing contact update...')
+    const testContact = {
+      id: 'test-contact-123',
+      name: 'Test Contact',
+      phoneNumbers: [
+        {
+          id: 'phone-1',
+          number: '+1234567890',
+          label: 'mobile'
+        }
+      ],
+      selectedPhoneNumber: {
+        id: 'phone-1',
+        number: '+1234567890',
+        label: 'mobile'
+      }
+    }
+    
+    console.log('🧪 Updating with test contact:', testContact)
+    updateSelectedContact(testContact)
+    
+    Alert.alert(
+      'Test Contact',
+      'Contact de test ajouté. Vérifiez les logs et la base de données.',
+      [{ text: 'OK' }]
+    )
+  };
+
+  const handleResetAndTest = () => {
+    console.log('🔄 Resetting and testing with UUID...')
+    // Forcer la déconnexion et reconnexion pour avoir un UUID valide
+    Alert.alert(
+      'Reset UUID',
+      'Voulez-vous vous déconnecter et vous reconnecter pour avoir un UUID valide ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { 
+          text: 'OK', 
+          onPress: () => {
+            // Déconnexion
+            removeSelectedContact()
+            // Reconnecter en VIP pour avoir un UUID valide
+            setTimeout(() => {
+              logInAsVip()
+              console.log('🔄 Reconnected with new UUID')
+            }, 100)
+          }
+        }
+      ]
+    )
   };
   const ref = useAnimatedRef();
   const scroll = useScrollViewOffset(ref);
@@ -161,6 +214,27 @@ export default function IndexScreen() {
 
         {/* Section Contact sélectionné */}
         <Form.Section title={t('selectedContact')}>
+          {/* Boutons de test */}
+          <View style={{ gap: 8, marginBottom: 8 }}>
+            <TouchableOpacity 
+              onPress={handleTestContactUpdate}
+              style={{ padding: 8, backgroundColor: AC.systemGray5, borderRadius: 8 }}
+            >
+              <AppText size="small" center>
+                🧪 Test: Ajouter un contact de test
+              </AppText>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={handleResetAndTest}
+              style={{ padding: 8, backgroundColor: AC.systemOrange, borderRadius: 8 }}
+            >
+              <AppText size="small" center>
+                🔄 Reset UUID et reconnecter
+              </AppText>
+            </TouchableOpacity>
+          </View>
+          
           {user?.selectedContact ? (
             <Rounded padding style={{ alignItems: "center", gap: 8 }}>
               <View style={{ position: "relative", width: "100%" }}>

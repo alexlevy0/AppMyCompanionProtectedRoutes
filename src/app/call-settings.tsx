@@ -4,7 +4,7 @@ import { Pressable } from "react-native";
 import * as AC from "@bacons/apple-colors";
 import { useState, useEffect, useMemo } from "react";
 import { Switch } from "@/components/ui/switch";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { TimeSlot, DaySchedule, CallSettings } from "@/types";
 import { useI18n } from "@/utils/I18nContext";
 
@@ -108,7 +108,7 @@ const DayScheduleItem = ({
 };
 
 export default function CallSettingsScreen() {
-  const { user, updateCallSettings } = useAuthStore();
+  const { user, updateCallSettings } = useAuthStoreObserver();
   const { t } = useI18n();
   
   // Définir les jours de la semaine avec les traductions
