@@ -15,7 +15,7 @@ import {
 import { AppText } from "@/components/AppText";
 import * as Contacts from 'expo-contacts';
 import * as AC from '@bacons/apple-colors';
-import { useAuthStore } from '@/utils/authStore';
+import { useAuthStoreObserver } from '@/utils/authStoreLegend';
 import { useI18n } from '@/utils/I18nContext';
 import { SelectedContact } from '@/types';
 import Animated, { 
@@ -177,7 +177,7 @@ const ContactItem = ({
 
 export default function ModalScreenScreen() {
   const { t } = useI18n();
-  const { user, updateSelectedContact } = useAuthStore();
+  const { user, updateSelectedContact } = useAuthStoreObserver();
   const [contacts, setContacts] = useState<SelectedContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<SelectedContact | null>(null);

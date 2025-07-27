@@ -1,12 +1,12 @@
 import { View, TextInput, Alert, ScrollView } from "react-native";
 import { AppText } from "@/components/AppText";
 import { Button } from "@/components/Button";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { useState } from "react";
 import { router } from "expo-router";
 
 export default function RegisterModal() {
-  const { register } = useAuthStore();
+  const { register } = useAuthStoreObserver();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
