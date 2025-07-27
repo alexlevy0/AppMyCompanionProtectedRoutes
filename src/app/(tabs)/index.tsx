@@ -33,7 +33,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useI18n } from "@/utils/I18nContext";
-import { useAuthStoreObserver } from "@/utils/authStoreLegend";
+import { useAuthStoreObserver, authState$ } from "@/utils/authStoreLegend";
 
 export default function IndexScreen() {
   const { t } = useI18n();
@@ -108,6 +108,20 @@ export default function IndexScreen() {
         }
       ]
     )
+  };
+
+  const handleForceRefresh = () => {
+    console.log('🔄 Force refreshing user from observable...')
+    // Forcer le rechargement en changeant l'ID utilisateur temporairement
+    const currentUserId = authState$.currentUserId.get()
+    if (currentUserId) {
+      // Simuler un changement d'ID pour forcer le rechargement
+      authState$.currentUserId.set(null)
+      setTimeout(() => {
+        authState$.currentUserId.set(currentUserId)
+        console.log('🔄 User ID reset, should trigger refresh')
+      }, 100)
+    }
   };
   const ref = useAnimatedRef();
   const scroll = useScrollViewOffset(ref);
@@ -231,6 +245,24 @@ export default function IndexScreen() {
             >
               <AppText size="small" center>
                 🔄 Reset UUID et reconnecter
+              </AppText>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={handleForceRefresh}
+              style={{ padding: 8, backgroundColor: AC.systemBlue, borderRadius: 8 }}
+            >
+              <AppText size="small" center>
+                🔄 Forcer le rechargement de l'utilisateur
+              </AppText>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={handleRemoveContact}
+              style={{ padding: 8, backgroundColor: AC.systemRed, borderRadius: 8 }}
+            >
+              <AppText size="small" center>
+                🗑️ Supprimer le contact sélectionné
               </AppText>
             </TouchableOpacity>
           </View>

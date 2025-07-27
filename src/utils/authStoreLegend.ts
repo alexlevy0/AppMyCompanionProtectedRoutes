@@ -26,7 +26,9 @@ import {
   updateUserSelectedContact,
   getUserByEmail,
   getUserById,
+  getUserByIdSync,
 } from './SupaLegend'
+import React from 'react'
 
 // Utility functions
 export function hashPassword(password: string): string {
@@ -201,7 +203,7 @@ export function useAuthStore() {
   const currentUserId = state.currentUserId
   
   // Obtenir l'utilisateur actuel depuis Supabase
-  const currentUser = currentUserId ? getUserById(currentUserId) : null
+  const currentUser = currentUserId ? getUserByIdSync(currentUserId) : null
   const user = currentUser ? mapSupabaseUserToAppUser(currentUser) : null
   
   return {
@@ -213,6 +215,52 @@ export function useAuthStore() {
 
 // Hook observer pour les composants React
 export const useAuthStoreObserver = () => {
+  const [user, setUser] = React.useState<any>(null)
+  const [isLoadingUser, setIsLoadingUser] = React.useState(false)
+  
+  // Obtenir l'ID de l'utilisateur actuel
+  const currentUserId = authState$.currentUserId.get()
+  
+  // Charger l'utilisateur de manière asynchrone
+  React.useEffect(() => {
+    if (currentUserId) {
+      setIsLoadingUser(true)
+      
+      // D'abord essayer de récupérer depuis l'observable local
+      const localUser = getUserByIdSync(currentUserId)
+      
+      if (localUser) {
+        setUser(localUser)
+        setIsLoadingUser(false)
+      } else {
+        // Si pas dans l'observable local, charger depuis Supabase
+        getUserById(currentUserId).then((supabaseUser) => {
+          setUser(supabaseUser)
+          setIsLoadingUser(false)
+        }).catch((error) => {
+          console.error('Error loading user:', error)
+          setIsLoadingUser(false)
+        })
+      }
+    } else {
+      setUser(null)
+      setIsLoadingUser(false)
+    }
+  }, [currentUserId])
+  
+  // Écouter les changements de l'observable users$ pour l'utilisateur actuel
+  React.useEffect(() => {
+    if (currentUserId) {
+      // Créer un observateur pour l'utilisateur spécifique
+      const unsubscribe = users$[currentUserId].onChange(({ value }) => {
+        console.log('🔄 User updated in observable, updating UI:', value)
+        setUser(value)
+      })
+      
+      return unsubscribe
+    }
+  }, [currentUserId])
+  
   // Retourner directement les observables pour que Legend-State puisse les observer
   return {
     // Observables pour déclencher les re-renders
@@ -223,12 +271,13 @@ export const useAuthStoreObserver = () => {
     get _hasHydrated() { return authState$._hasHydrated.get() },
     get currentUserId() { return authState$.currentUserId.get() },
     
-    // Obtenir l'utilisateur actuel depuis Supabase
+    // Obtenir l'utilisateur actuel
     get user() {
-      const currentUserId = authState$.currentUserId.get()
-      const currentUser = currentUserId ? getUserById(currentUserId) : null
-      return currentUser ? mapSupabaseUserToAppUser(currentUser) : null
+      return user ? mapSupabaseUserToAppUser(user) : null
     },
+    
+    // État de chargement
+    get isLoadingUser() { return isLoadingUser },
     
     // Actions
     ...authActions,

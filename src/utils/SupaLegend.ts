@@ -113,29 +113,34 @@ export function updateUserSelectedContact(id: string, contact: SelectedContact |
     users$[id].set(updatedUser)
     console.log('🔍 Updated user in observable:', updatedUser)
     
-    supabase.from('users').update({ selected_contact: contact }).eq('id', id).then(({ error, data }) => {
+    return supabase.from('users').update({ selected_contact: contact }).eq('id', id).then(({ error, data }) => {
       if (error) {
         console.error('❌ Error updating selected contact in Supabase:', error)
+        return { success: false, error }
       } else {
         console.log('✅ Selected contact updated in Supabase:', { id, contact, data })
+        return { success: true, data }
       }
     })
   } else {
     console.warn('⚠️ User not found in observable for ID:', id)
     // Essayer de récupérer l'utilisateur depuis Supabase
-    supabase.from('users').select('*').eq('id', id).single().then(({ data, error }) => {
+    return supabase.from('users').select('*').eq('id', id).single().then(({ data, error }) => {
       if (error) {
         console.error('❌ User not found in Supabase:', error)
+        return { success: false, error }
       } else {
         console.log('✅ User found in Supabase, updating...', data)
         // Créer l'utilisateur dans l'observable local
         users$[id].set({ ...data, selected_contact: contact })
         // Mettre à jour dans Supabase
-        supabase.from('users').update({ selected_contact: contact }).eq('id', id).then(({ error }) => {
+        return supabase.from('users').update({ selected_contact: contact }).eq('id', id).then(({ error }) => {
           if (error) {
             console.error('❌ Error updating selected contact in Supabase:', error)
+            return { success: false, error }
           } else {
             console.log('✅ Selected contact updated in Supabase after user fetch')
+            return { success: true }
           }
         })
       }
@@ -162,7 +167,41 @@ export function getUserByEmail(email: string) {
 }
 
 // Fonction pour obtenir un utilisateur par ID
-export function getUserById(id: string) {
+export async function getUserById(id: string) {
+  // D'abord, essayer de récupérer depuis l'observable local
+  const localUser = users$[id].get()
+  
+  if (localUser) {
+    return localUser
+  }
+  
+  // Si l'utilisateur n'est pas dans l'observable local, essayer de le récupérer depuis Supabase
+  console.log('🔍 User not found in local observable, fetching from Supabase:', id)
+  
+  try {
+    const { data, error } = await supabase.from('users').select('*').eq('id', id).single()
+    
+    if (error) {
+      console.error('❌ Error fetching user from Supabase:', error)
+      return null
+    }
+    
+    if (data) {
+      // Ajouter l'utilisateur à l'observable local
+      users$[id].set(data)
+      console.log('✅ User loaded from Supabase and added to local observable:', id)
+      return data
+    }
+    
+    return null
+  } catch (error) {
+    console.error('❌ Exception while fetching user from Supabase:', error)
+    return null
+  }
+}
+
+// Fonction synchrone pour obtenir un utilisateur par ID (pour la compatibilité)
+export function getUserByIdSync(id: string) {
   return users$[id].get()
 }
 
