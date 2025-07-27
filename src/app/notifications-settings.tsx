@@ -4,7 +4,7 @@ import * as Form from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import * as AC from "@bacons/apple-colors";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { NotificationSettings } from "@/types";
 import i18n from "@/utils/i18n";
 
@@ -16,7 +16,7 @@ const getDefaultNotificationSettings = (): NotificationSettings => ({
 });
 
 export default function ModalScreenScreen() {
-  const { user, updateNotificationSettings } = useAuthStore();
+  const { user, updateNotificationSettings } = useAuthStoreObserver();
 
   // Initialize state from store or defaults
   const [notificationSettings, setNotificationSettings] =

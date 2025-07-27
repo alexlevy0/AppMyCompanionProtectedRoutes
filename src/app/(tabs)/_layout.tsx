@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStoreObserver } from "@/utils/authStoreLegend";
 import { Tabs } from "expo-router";
 import Animated from "react-native-reanimated";
 import { Image } from "expo-image";
@@ -8,21 +8,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { useI18n } from "@/utils/I18nContext";
 
 export default function TabsLayout() {
-  const { isVip } = useAuthStore();
+  const { isVip } = useAuthStoreObserver();
   const { t } = useI18n();
   return (
     <Tabs>
-              <Tabs.Screen
-          name="index"
-          options={{
-            title: t('home'),
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? "home" : "home-outline"}
-                size={size}
-                color={color}
-              />
-            ),
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: t("home"),
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
+            />
+          ),
           headerTitle() {
             if (process.env.EXPO_OS === "web") {
               return (
@@ -32,7 +32,9 @@ export default function TabsLayout() {
                   ]}
                 >
                   <Image
-                    source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
+                    source={{
+                      uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true",
+                    }}
                     style={[
                       {
                         aspectRatio: 1,
@@ -50,14 +52,16 @@ export default function TabsLayout() {
                       fontWeight: "bold",
                     }}
                   >
-                    {t('appName')}
+                    {t("appName")}
                   </Text>
                 </Animated.View>
               );
             }
             return (
               <Animated.Image
-                source={{ uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true" }}
+                source={{
+                  uri: "https://github.com/alexlevy0/getmycompanion.com/blob/main/android-chrome-512x512.png?raw=true",
+                }}
                 style={[
                   {
                     aspectRatio: 1,
@@ -76,7 +80,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="vip"
           options={{
-            title: t('vip'),
+            title: t("vip"),
             tabBarIcon: ({ focused, color, size }) => (
               <Ionicons
                 name={focused ? "diamond" : "diamond-outline"}
@@ -87,32 +91,32 @@ export default function TabsLayout() {
           }}
         />
       </Tabs.Protected>
-              <Tabs.Screen
-          name="chats"
-          options={{
-            title: t('chats'),
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? "chatbubble" : "chatbubble-outline"}
-                size={size}
-                color={color}
-              />
-            ),
-          }}
-        />
-              <Tabs.Screen
-          name="settings"
-          options={{
-            title: t('settings'),
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? "settings" : "settings-outline"}
-                size={size}
-                color={color}
-              />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="chats"
+        options={{
+          title: t("chats"),
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "chatbubble" : "chatbubble-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: t("settings"),
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
