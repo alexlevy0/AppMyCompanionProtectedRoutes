@@ -9,7 +9,7 @@ import { useI18n } from "@/utils/I18nContext";
 
 export default function TabsLayout() {
   const { isVip } = useAuthStoreObserver();
-  const { t } = useI18n();
+  const { t } = useI18n();  
   return (
     <Tabs>
       <Tabs.Screen

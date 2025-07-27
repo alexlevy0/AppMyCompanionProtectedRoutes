@@ -131,9 +131,7 @@ const translations = {
     phoneNumbersPlural: 'numéros de téléphone',
     removeContact: 'Supprimer le contact',
     contactRemoved: 'Contact supprimé',
-    confirmRemoveContact: 'Êtes-vous sûr de vouloir supprimer',
-    cancel: 'Annuler',
-    remove: 'Supprimer'
+    confirmRemoveContact: 'Êtes-vous sûr de vouloir supprimer'
   },
   en: {
     // Navigation
@@ -262,9 +260,7 @@ const translations = {
     phoneNumbersPlural: 'phone numbers',
     removeContact: 'Remove contact',
     contactRemoved: 'Contact removed',
-    confirmRemoveContact: 'Are you sure you want to remove',
-    cancel: 'Cancel',
-    remove: 'Remove'
+    confirmRemoveContact: 'Are you sure you want to remove'
   }
 };
 
@@ -276,5 +272,7 @@ i18n.locale = getLocales()[0].languageCode ?? 'fr';
 
 // Activer le fallback pour les traductions manquantes
 i18n.enableFallback = true;
+
+
 
 export default i18n; 

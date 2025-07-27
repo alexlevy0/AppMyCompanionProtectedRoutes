@@ -36,8 +36,15 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const t = useCallback((key: string, params?: Record<string, any>) => {
     // Utiliser refreshKey pour forcer le re-render quand la langue change
     refreshKey;
-    return i18n.t(key, params);
-  }, [refreshKey]);
+    const result = i18n.t(key, params);
+    
+    // // Debug log pour les clés importantes
+    // if (['home', 'settings', 'chats', 'vip'].includes(key)) {
+    //   console.log(`🌐 Translation [${currentLocale}]: ${key} = "${result}"`);
+    // }
+    
+    return result;
+  }, [refreshKey, currentLocale]);
 
   const contextValue: I18nContextType = {
     t,
