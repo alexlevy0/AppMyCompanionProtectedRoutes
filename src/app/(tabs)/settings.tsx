@@ -147,11 +147,6 @@ export default function SettingsScreen() {
               <Form.Text>{t('notifications')}</Form.Text>
             </View>
           </Link>
-          <Link href="/(tabs)/test-sync">
-            <View style={{ gap: 4 }}>
-              <Form.Text>Test Synchronisation</Form.Text>
-            </View>
-          </Link>
         </Form.Section>
         
         <Form.Section title={t('language')}>
